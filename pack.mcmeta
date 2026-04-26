@@ -1,0 +1,16 @@
+{
+  "pack": {
+    "id": "CE",
+    "description": "A simple JJ mod",
+    "pack_format": 15,
+    "version": "1.0.0"
+  },
+  "dependencies": {
+    "common": {
+    },
+    "fabric": {
+    },
+    "forge": {
+    }
+  }
+}

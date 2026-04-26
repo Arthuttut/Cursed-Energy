@@ -1,0 +1,41 @@
+{
+  "name": "Boogie Woogie",
+  "background": "minecraft:textures/block/red_wool.png",
+  "icon": "ce:textures/icon/techniques/boogie_woogie.png",
+  "abilities": {
+    "scoreboard": {
+      "type": "palladium:command",
+      "hidden": true,
+      "hidden_in_bar": true,
+      "first_tick_commands": [
+        "scoreboard objectives add swap_range dummy",
+        "scoreboard players set @s swap_range 400"
+      ],
+      "commands": []
+    },
+
+    "boogie_woogie": {
+      "type": "palladium:command",
+      "icon": "ce:textures/icon/techniques/boogie_woogie.png",
+      "title": "Boogie Woogie",
+      "bar_color": "cyan",
+      "hidden": false,
+      "hidden_in_bar": false,
+      "list_index": 0,
+      "gui_position": "null",
+      "description": "swap your location",
+      "first_tick_commands": [
+        "function ce:swap"
+      ],
+      "commands": [],
+      "conditions": {
+        "enabling": {
+          "type": "palladium:action",
+          "cooldown": 0.8,
+          "key_type": "key_bind",
+          "needs_empty_hand": true
+        }
+      }
+    }
+  }
+}

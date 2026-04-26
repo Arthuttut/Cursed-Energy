@@ -1,0 +1,11 @@
+{
+    "schemaVersion": 1,
+    "authors": [],
+    "environment": "*",
+    "name": "Cursed Energy",
+    "id": "CE",
+    "version": "1.0.0",
+    "description": "A simple JJ mod",
+    "icon": "logo.png",
+    "license": "All rights reserved"
+}

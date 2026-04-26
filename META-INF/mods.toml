@@ -1,0 +1,21 @@
+modLoader = 'lowcodefml'
+showAsResourcePack = false
+loaderVersion="[47,)"
+license="All rights reserved"
+
+[[mods]]
+modId="CE"
+displayName="Cursed Energy"
+version="1.0.0"
+logoFile = "logo.png"
+logoBlur = false
+description='''
+A simple JJ mod
+'''
+
+[[dependencies.CE]]
+modId = "palladium"
+mandatory = true
+versionRange = ""
+ordering = "NONE"
+side = "BOTH"
