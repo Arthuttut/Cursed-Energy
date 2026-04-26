@@ -25,15 +25,16 @@
       "gui_position": "null",
       "description": "swap your location",
       "first_tick_commands": [
-        "function ce:swap"
+        "execute as @s if score @s cursed_energy matches 80.. run function ce:swap",
+        "execute as @s if score @s cursed_energy matches 80.. run scoreboard players remove @s cursed_energy 80"
       ],
       "commands": [],
       "conditions": {
         "enabling": {
-          "type": "palladium:action",
-          "cooldown": 0.8,
-          "key_type": "key_bind",
-          "needs_empty_hand": true
+        "type": "palladium:action",
+        "cooldown": 0.8,
+        "key_type": "key_bind",
+        "needs_empty_hand": true
         }
       }
     }
