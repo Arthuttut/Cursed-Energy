@@ -8,7 +8,8 @@
       "hidden": true,
       "hidden_in_bar": true,
       "first_tick_commands": [
-        "scoreboard objectives add cursed_energy dummy \"Cursed Energy\""
+        "scoreboard objectives add cursed_energy dummy \"Cursed Energy\"",
+        "scoreboard players set @s cursed_energy 0"
       ],
       "last_tick_commands": [],
       "commands": [
