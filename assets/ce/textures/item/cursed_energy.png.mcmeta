@@ -1,0 +1,8 @@
+{
+  "animation": {
+    "frametime": 3,
+    "width": 20,
+    "height": 26,
+    "frames": [0, 1, 2, 3, 4, 5]
+  }
+}

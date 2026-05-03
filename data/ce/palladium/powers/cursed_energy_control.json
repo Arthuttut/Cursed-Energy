@@ -3,17 +3,12 @@
   "background": "minecraft:textures/block/red_wool.png",
   "icon": "ce:textures/icon/misc/cursed_energy.png",
   "abilities": {
-    "scoreboard": {
+    "cursed_energy": {
       "type": "palladium:command",
       "hidden": true,
       "hidden_in_bar": true,
-      "first_tick_commands": [
-        "scoreboard objectives add cursed_energy dummy \"Cursed Energy\"",
-        "scoreboard players set @s cursed_energy 0"
-      ],
-      "last_tick_commands": [],
       "commands": [
-        "title @s actionbar [{\"text\":\" \",\"color\":\"aqua\"},{\"score\":{\"name\":\"@s\",\"objective\":\"cursed_energy\"},\"color\":\"aqua\"},{\"text\":\" / 1300\",\"color\":\"aqua\"}]"
+        "execute as @s unless score @s sukuna_fingers matches 1..20 run title @s actionbar [{\"text\":\" \",\"color\":\"aqua\"},{\"score\":{\"name\":\"@s\",\"objective\":\"cursed_energy\"},\"color\":\"aqua\"},{\"text\":\" / 1300\",\"color\":\"aqua\"}]"
       ]
     },
     "cursed_energy_increase": {
@@ -85,6 +80,14 @@
           "ability": "cursed_energy_hand"
         }
       }
+    },
+    "sukuna_finger": {
+      "type": "palladium:command",
+      "hidden": true,
+      "hidden_in_bar": true,
+      "commands": [
+        "execute if score @s sukuna_fingers matches 1..20 run superpower add ce:king_of_curses @s"
+      ]
     }
   }
 }

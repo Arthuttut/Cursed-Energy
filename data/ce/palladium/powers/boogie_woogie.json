@@ -13,7 +13,6 @@
       ],
       "commands": []
     },
-
     "boogie_woogie": {
       "type": "palladium:command",
       "icon": "ce:textures/icon/techniques/boogie_woogie.png",
@@ -31,10 +30,10 @@
       "commands": [],
       "conditions": {
         "enabling": {
-        "type": "palladium:action",
-        "cooldown": 0.8,
-        "key_type": "key_bind",
-        "needs_empty_hand": true
+          "type": "palladium:action",
+          "cooldown": 0.8,
+          "key_type": "key_bind",
+          "needs_empty_hand": true
         }
       }
     }

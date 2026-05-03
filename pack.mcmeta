@@ -1,14 +1,18 @@
 {
   "pack": {
-    "id": "CE",
-    "description": "A simple JJ mod",
+    "id": "ce",
+    "description": "A simple JJK mod",
     "pack_format": 15,
     "version": "1.0.0"
   },
   "dependencies": {
     "common": {
+      "palladium": ">=4.5.5",
+      "pehkui": "*",
+      "kubejs": "*"
     },
     "fabric": {
+      "fabric-api": "*"
     },
     "forge": {
     }

@@ -1,0 +1,299 @@
+{
+  "name": "Celestial Restriction",
+  "background": "minecraft:textures/block/red_wool.png",
+  "icon": "minecraft:apple",
+  "abilities": {
+    "scoreboard": {
+      "type": "palladium:command",
+      "hidden": true,
+      "hidden_in_bar": true,
+      "first_tick_commands": [
+        "tag @s add celestial_restriction",
+        "scale set pehkui:step_height 1.7 @s"
+      ],
+      "last_tick_commands": [
+        "scale set pehkui:step_height 1 @s"
+      ],
+      "commands": []
+    },
+    "sprint_increase": {
+      "type": "palladium:command",
+      "hidden": true,
+      "hidden_in_bar": true,
+      "commands": [
+        "scoreboard players add @s sprint 1"
+      ],
+      "conditions": {
+        "enabling": [
+          {
+            "type": "palladium:sprinting"
+          },
+          {
+            "type": "palladium:not",
+            "conditions": [
+              {
+                "type": "palladium:objective_score",
+                "objective": "sprint",
+                "min_score": 150,
+                "max_score": 150
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "sprint_decrease": {
+      "type": "palladium:command",
+      "hidden": true,
+      "hidden_in_bar": true,
+      "commands": [
+        "scoreboard players remove @s sprint 1"
+      ],
+      "conditions": {
+        "enabling": {
+          "type": "palladium:not",
+          "conditions": [
+            {
+              "type": "palladium:sprinting"
+            },
+            {
+              "type": "palladium:objective_score",
+              "objective": "sprint",
+              "min_score": 0,
+              "max_score": 0
+            }
+          ]
+        }
+      }
+    },
+    "sprint": {
+      "type": "ce:dynamic_multi_attribute",
+      "hidden": true,
+      "hidden_in_bar": true,
+      "property": "sprint",
+      "intervals": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30",
+        "31",
+        "32",
+        "33",
+        "34",
+        "35",
+        "36",
+        "37",
+        "38",
+        "39",
+        "40",
+        "41",
+        "42",
+        "43",
+        "44",
+        "45",
+        "46",
+        "47",
+        "48",
+        "49",
+        "50",
+        "51",
+        "52",
+        "53",
+        "54",
+        "55",
+        "56",
+        "57",
+        "58",
+        "59",
+        "60",
+        "61",
+        "62",
+        "63",
+        "64",
+        "65",
+        "66",
+        "67",
+        "68",
+        "69",
+        "70",
+        "71",
+        "72",
+        "73",
+        "74",
+        "75",
+        "76",
+        "77",
+        "78",
+        "79",
+        "80",
+        "81",
+        "82",
+        "83",
+        "84",
+        "85",
+        "86",
+        "87",
+        "88",
+        "89",
+        "90",
+        "91",
+        "92",
+        "93",
+        "94",
+        "95",
+        "96",
+        "97",
+        "98",
+        "99",
+        "100",
+        "101",
+        "102",
+        "103",
+        "104",
+        "105",
+        "106",
+        "107",
+        "108",
+        "109",
+        "110",
+        "111",
+        "112",
+        "113",
+        "114",
+        "115",
+        "116",
+        "117",
+        "118",
+        "119",
+        "120",
+        "121",
+        "122",
+        "123",
+        "124",
+        "125",
+        "126",
+        "127",
+        "128",
+        "129",
+        "130",
+        "131",
+        "132",
+        "133",
+        "134",
+        "135",
+        "136",
+        "137",
+        "138",
+        "139",
+        "140",
+        "141",
+        "142",
+        "143",
+        "144",
+        "145",
+        "146",
+        "147",
+        "148",
+        "149",
+        "150"
+      ],
+      "attributes": [
+        "minecraft:generic.movement_speed"
+      ],
+      "amounts": [
+        "0.001"
+      ],
+      "operations": [
+        "add"
+      ],
+      "uuids": [
+        "d83e0330-70f4-4017-896a-d3368f41a4f4"
+      ]
+    },
+    "attributes": {
+      "type": "ce:dynamic_multi_attribute",
+      "hidden": true,
+      "hidden_in_bar": true,
+      "property": "celestial_restriction",
+      "intervals": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "attributes": [
+        "palladium:punch_damage",
+        "palladium:leaping",
+        "palladium:jump_power",
+        "palladium:fall_resistance",
+        "minecraft:generic.max_health",
+        "minecraft:generic.armor",
+        "minecraft:generic.armor_toughness",
+        "minecraft:generic.knockback_resistance",
+        "minecraft:generic.attack_speed"
+      ],
+      "amounts": [
+        "3.0",
+        "0.30",
+        "0.12",
+        "21",
+        "4.0",
+        "2",
+        "0.8",
+        "0.08",
+        "0.25"
+      ],
+      "operations": [
+        "add",
+        "add",
+        "add",
+        "add",
+        "add",
+        "add",
+        "add",
+        "add",
+        "add"
+      ],
+      "uuids": [
+        "f1194ce4-43a2-4726-bbbe-9ddddf55d815",
+        "ec2c1dcf-533e-4d75-9163-d5114037faa6",
+        "5e305307-f543-44e2-9665-b1d0a65a726f",
+        "d2bf2fac-cdc6-4380-8399-9a7093a69f19",
+        "96e613cf-cc85-40de-a0fe-635c3ee633ed",
+        "23cf996f-ca35-4fad-8351-2c8a80072ed3",
+        "6c9dad2b-0097-44a2-a0ad-804b87b4ed89",
+        "6476d410-8cb5-4378-a1df-854ad739f43b",
+        "f5b7ca79-ba29-4efd-a521-621759ae7ce9"
+      ]
+    }
+  }
+}
