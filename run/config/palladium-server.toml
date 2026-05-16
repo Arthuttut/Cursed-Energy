@@ -1,4 +1,0 @@
-#How many superpowers a player can have at once
-# Default: 1
-# Range: 1 ~ 10
-max_superpower_sets = 1

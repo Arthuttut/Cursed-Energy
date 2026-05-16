@@ -1,9 +1,0 @@
-{
-  "name": "Cursed Items",
-  "icon": "ce:sukuna_finger",
-  "items": [
-    "ce:cursed_energy",
-    "ce:rikas_ring",
-    "ce:sukuna_finger"
-  ]
-}

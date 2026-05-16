@@ -1,8 +1,0 @@
-{
-    "type": "minecraft:item",
-    "properties": {
-        "components": {
-            "minecraft:rarity": "rare"
-        }
-    }
-}

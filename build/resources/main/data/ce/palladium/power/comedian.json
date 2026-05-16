@@ -1,7 +1,0 @@
-{
-    "name": "Comedian",
-    "icon": "ce:textures/icon/misc/cursed_energy.png",
-    "parent": "ce:cursed_energy_control",
-    "abilities": {
-    }
-}
