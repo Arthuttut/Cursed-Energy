@@ -53,4 +53,4 @@ A Simple JJK Mod that adds cursed energy and jujutsu techniques to Minecraft.
 
 # Developer
 Made by Heko / Arthur, <br>
-obs: to change or add a technique for player use: palladium superpower add ce:technique that you want
+obs: to change or add a technique for player use: `palladium superpower add ce:technique that you want`
