@@ -1,0 +1,16 @@
+{
+    "initial_state": "default",
+    "states": {
+        "default": {
+            "transitions": {
+                "run": "query.is_sprinting() && query.is_on_ground()"
+            }
+        },
+        "run": {
+            "animation": "ce:run",
+            "transitions": {
+                "default": "query.is_sprinting() == false || query.is_on_ground() == false"
+            }
+        }
+    }
+}

@@ -1,0 +1,276 @@
+---- Minecraft Crash Report ----
+// Shall we play a game?
+
+Time: 2026-05-08 20:10:12
+Description: Bootstrap
+
+java.lang.RuntimeException: java.lang.NoClassDefFoundError: com/zigythebird/playeranimcore/animation/layered/AnimationStack
+	at net.neoforged.fml.loading.BackgroundWaiter.runAndTick(BackgroundWaiter.java:29) ~[loader-11.0.13.jar:11.0] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.main.Main.main(Main.java:118) [minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at net.neoforged.fml.startup.Client.main(Client.java:19) [loader-11.0.13.jar:11.0] {}
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[?:?] {}
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[?:?] {}
+	at net.neoforged.devlaunch.Main.main(Main.java:57) [DevLaunch-1.0.2.jar:?] {}
+Caused by: java.lang.NoClassDefFoundError: com/zigythebird/playeranimcore/animation/layered/AnimationStack
+	at java.base/java.lang.ClassLoader.defineClass1(Native Method) ~[?:?] {}
+	at java.base/java.lang.ClassLoader.defineClass(ClassLoader.java:962) ~[?:?] {}
+	at net.neoforged.fml.classloading.ModuleClassLoader.readerToClass(ModuleClassLoader.java:229) ~[loader-11.0.13.jar:11.0] {}
+	at net.neoforged.fml.classloading.ModuleClassLoader.loadClass(ModuleClassLoader.java:245) ~[loader-11.0.13.jar:11.0] {}
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:490) ~[?:?] {}
+	at java.base/java.lang.Class.getDeclaredFields0(Native Method) ~[?:?] {}
+	at java.base/java.lang.Class.privateGetDeclaredFields(Class.java:2917) ~[?:?] {}
+	at java.base/java.lang.Class.getDeclaredFields(Class.java:2247) ~[?:?] {}
+	at TRANSFORMER/neoforge@26.1.2.42-beta/net.neoforged.neoforge.common.CommonHooks.verifyEntityDataAccessorRegistration(CommonHooks.java:1751) ~[neoforge-26.1.2.42-beta-universal.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.syncher.SynchedEntityData.defineId(SynchedEntityData.java:31) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.entity.Avatar.<clinit>(Avatar.java:38) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge:mixin[APP:player_animation_library.mixins.json:AvatarMixin from mod player_animation_library]}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.entity.EntityType.<clinit>(EntityType.java:713) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge.coremods:method_redirector}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.core.component.DataComponents.lambda$static$58(DataComponents.java:261) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.core.component.DataComponents.register(DataComponents.java:433) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.core.component.DataComponents.<clinit>(DataComponents.java:260) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.item.Item$Properties.fireResistant(Item.java:461) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge:access_transformer}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.item.Items.<clinit>(Items.java:146) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.level.block.LightBlock.getShape(LightBlock.java:65) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.getShape(BlockBehaviour.java:671) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge:mixin[APP:palladium.mixins.json:BlockStateBaseMixin from mod palladium]}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.getShape(BlockBehaviour.java:667) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge:mixin[APP:palladium.mixins.json:BlockStateBaseMixin from mod palladium]}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.level.block.state.BlockBehaviour.getCollisionShape(BlockBehaviour.java:319) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge:access_transformer,neoforge:access_transformer,neoforge:mixin[APP:palladium.mixins.json:BlockBehaviourMixin from mod palladium]}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase$Cache.<init>(BlockBehaviour.java:916) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.initCache(BlockBehaviour.java:494) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge:mixin[APP:palladium.mixins.json:BlockStateBaseMixin from mod palladium]}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.level.block.Blocks.<clinit>(Blocks.java:7226) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge:access_transformer}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.level.block.FireBlock.bootStrap(FireBlock.java:323) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge:access_transformer}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.Bootstrap.bootStrap(Bootstrap.java:49) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.main.Main.lambda$main$0(Main.java:118) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545) ~[?:?] {}
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328) ~[?:?] {}
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090) ~[?:?] {}
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614) ~[?:?] {}
+	at java.base/java.lang.Thread.run(Thread.java:1474) ~[?:?] {}
+Caused by: java.lang.ClassNotFoundException: com.zigythebird.playeranimcore.animation.layered.AnimationStack
+	at java.base/java.lang.ClassLoader.findClass(ClassLoader.java:673) ~[?:?] {}
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:557) ~[?:?] {}
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:490) ~[?:?] {}
+	at net.neoforged.fml.classloading.ModuleClassLoader.loadClass(ModuleClassLoader.java:247) ~[loader-11.0.13.jar:11.0] {}
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:490) ~[?:?] {}
+	at java.base/java.lang.ClassLoader.defineClass1(Native Method) ~[?:?] {}
+	at java.base/java.lang.ClassLoader.defineClass(ClassLoader.java:962) ~[?:?] {}
+	at net.neoforged.fml.classloading.ModuleClassLoader.readerToClass(ModuleClassLoader.java:229) ~[loader-11.0.13.jar:11.0] {}
+	at net.neoforged.fml.classloading.ModuleClassLoader.loadClass(ModuleClassLoader.java:245) ~[loader-11.0.13.jar:11.0] {}
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:490) ~[?:?] {}
+	at java.base/java.lang.Class.getDeclaredFields0(Native Method) ~[?:?] {}
+	at java.base/java.lang.Class.privateGetDeclaredFields(Class.java:2917) ~[?:?] {}
+	at java.base/java.lang.Class.getDeclaredFields(Class.java:2247) ~[?:?] {}
+	at TRANSFORMER/neoforge@26.1.2.42-beta/net.neoforged.neoforge.common.CommonHooks.verifyEntityDataAccessorRegistration(CommonHooks.java:1751) ~[neoforge-26.1.2.42-beta-universal.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.syncher.SynchedEntityData.defineId(SynchedEntityData.java:31) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.entity.Avatar.<clinit>(Avatar.java:38) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge:mixin[APP:player_animation_library.mixins.json:AvatarMixin from mod player_animation_library]}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.entity.EntityType.<clinit>(EntityType.java:713) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge.coremods:method_redirector}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.core.component.DataComponents.lambda$static$58(DataComponents.java:261) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.core.component.DataComponents.register(DataComponents.java:433) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.core.component.DataComponents.<clinit>(DataComponents.java:260) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.item.Item$Properties.fireResistant(Item.java:461) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge:access_transformer}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.item.Items.<clinit>(Items.java:146) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.level.block.LightBlock.getShape(LightBlock.java:65) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.getShape(BlockBehaviour.java:671) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge:mixin[APP:palladium.mixins.json:BlockStateBaseMixin from mod palladium]}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.getShape(BlockBehaviour.java:667) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge:mixin[APP:palladium.mixins.json:BlockStateBaseMixin from mod palladium]}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.level.block.state.BlockBehaviour.getCollisionShape(BlockBehaviour.java:319) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge:access_transformer,neoforge:access_transformer,neoforge:mixin[APP:palladium.mixins.json:BlockBehaviourMixin from mod palladium]}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase$Cache.<init>(BlockBehaviour.java:916) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.initCache(BlockBehaviour.java:494) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge:mixin[APP:palladium.mixins.json:BlockStateBaseMixin from mod palladium]}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.level.block.Blocks.<clinit>(Blocks.java:7226) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge:access_transformer}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.world.level.block.FireBlock.bootStrap(FireBlock.java:323) ~[minecraft-patched-26.1.2.42-beta.jar:?] {neoforge:access_transformer}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.Bootstrap.bootStrap(Bootstrap.java:49) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.main.Main.lambda$main$0(Main.java:118) ~[minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545) ~[?:?] {}
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328) ~[?:?] {}
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090) ~[?:?] {}
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614) ~[?:?] {}
+	at java.base/java.lang.Thread.run(Thread.java:1474) ~[?:?] {}
+
+
+A detailed walkthrough of the error, its code path and all known details is as follows:
+---------------------------------------------------------------------------------------
+
+-- Head --
+Thread: main
+Stacktrace:
+	at net.neoforged.fml.loading.BackgroundWaiter.runAndTick(BackgroundWaiter.java:29) ~[loader-11.0.13.jar:11.0] {}
+-- Initialization --
+Details:
+	Modules: 
+		ADVAPI32.dll:API de base do Windows 32 avançada:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		BCrypt.dll:Biblioteca de Primitivos Criptografados do Windows:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		COMCTL32.dll:Biblioteca de Controles de Experiência do Usuário:6.10 (WinBuild.160101.0800):Microsoft Corporation
+		CRYPT32.dll:Crypto API32:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		CRYPTBASE.DLL:Base cryptographic API DLL:10.0.26100.8246 (WinBuild.160101.0800):Microsoft Corporation
+		CRYPTSP.dll:Cryptographic Service Provider API:10.0.26100.8246 (WinBuild.160101.0800):Microsoft Corporation
+		CoreMessaging.dll:Microsoft CoreMessaging Dll:10.0.26100.8246 (WinBuild.160101.0800):Microsoft Corporation
+		CoreUIComponents.dll:Microsoft Core UI Components Dll:10.0.26100.8246:Microsoft Corporation
+		DBGHELP.DLL:Windows Image Helper:10.0.26100.5074 (WinBuild.160101.0800):Microsoft Corporation
+		DEVOBJ.dll:Device Information Set DLL:10.0.26100.1150 (WinBuild.160101.0800):Microsoft Corporation
+		DNSAPI.dll:DLL da API de cliente DNS:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		GDI32.dll:GDI Client DLL:10.0.26100.8036 (WinBuild.160101.0800):Microsoft Corporation
+		GLU32.dll:DLL da biblioteca de utilitários OpenGL:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		IMM32.DLL:Multi-User Windows IMM32 API Client DLL:10.0.26100.8115 (WinBuild.160101.0800):Microsoft Corporation
+		IPHLPAPI.DLL:API de Auxiliar de IP:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		KERNEL32.DLL:DLL cliente da API BASE do Windows NT:10.0.26100.8115 (WinBuild.160101.0800):Microsoft Corporation
+		KERNELBASE.dll:DLL cliente da API BASE do Windows NT:10.0.26100.8115 (WinBuild.160101.0800):Microsoft Corporation
+		MSASN1.dll:ASN.1 Runtime APIs:10.0.26100.8246 (WinBuild.160101.0800):Microsoft Corporation
+		MSCTF.dll:DLL de servidor MSCTF:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		MpOav.dll:IOfficeAntiVirus Module:4.18.26030.3011 (58e93915dbf52150fd35efdb420a24f1e40d0e23):Microsoft Corporation
+		NSI.dll:NSI User-mode interface DLL:10.0.26100.8246 (WinBuild.160101.0800):Microsoft Corporation
+		OLEAUT32.dll:OLEAUT32.DLL:10.0.26100.8246 (WinBuild.160101.0800):Microsoft Corporation
+		POWRPROF.dll:DLL do Auxiliar do Perfil de Energia:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		PSAPI.DLL:Process Status Helper:10.0.26100.1 (WinBuild.160101.0800):Microsoft Corporation
+		RPCRT4.dll:Tempo de Execução da Chamada de Procedimento Remoto:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		SETUPAPI.dll:API de instalação do Windows:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		SHCORE.dll:SHCORE:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		SHELL32.dll:DLL comum do Shell do Windows:10.0.26100.8117 (WinBuild.160101.0800):Microsoft Corporation
+		UMPDC.dll:User Mode Power Dependency Coordinator:10.0.26100.8115 (WinBuild.160101.0800):Microsoft Corporation
+		USER32.dll:DLL de cliente API de usuário Windows para multiusuários:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		USERENV.dll:Userenv:10.0.26100.7920 (WinBuild.160101.0800):Microsoft Corporation
+		VCRUNTIME140.dll:Microsoft® C Runtime Library:14.40.33810.0:Microsoft Corporation
+		VERSION.dll:Version Checking and File Installation Libraries:10.0.26100.1150 (WinBuild.160101.0800):Microsoft Corporation
+		WINMM.dll:MCI API DLL:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		WINTRUST.dll:Microsoft Trust Verification APIs:10.0.26100.8115 (WinBuild.160101.0800):Microsoft Corporation
+		WS2_32.dll:DLL de 32 bits do Windows Socket 2.0:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		amdihk64.dll:Radeon Settings: Host Service:2,00,00,1788:Advanced Micro Devices, Inc.
+		amsi.dll:Anti-Malware Scan Interface:10.0.26100.7309 (WinBuild.160101.0800):Microsoft Corporation
+		atig6pxx.dll:atiglpxx.dll:8.14.01.6564:Advanced Micro Devices, Inc. 
+		atio6axx.dll:AMD OpenGL Driver:25.12.230729_569461f:Advanced Micro Devices, Inc
+		bcryptPrimitives.dll:Windows Cryptographic Primitives Library:10.0.26100.8246 (WinBuild.160101.0800):Microsoft Corporation
+		cfgmgr32.dll:Configuration Manager DLL:10.0.26100.8115 (WinBuild.160101.0800):Microsoft Corporation
+		clbcatq.dll:COM+ Configuration Catalog:2001.12.10941.16384 (WinBuild.160101.0800):Microsoft Corporation
+		combase.dll:Microsoft COM para Windows:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		dbgcore.DLL:Windows Core Debugging Helpers:10.0.26100.8115 (WinBuild.160101.0800):Microsoft Corporation
+		dinput8.dll:Microsoft DirectInput:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		directxdatabasehelper.dll:DirectXDatabaseHelper:10.0.26100.8115 (WinBuild.160101.0800):Microsoft Corporation
+		dwmapi.dll:API do Gerenciador de Janelas da Área de Trabalho Microsoft:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		dxcore.dll:DXCore:10.0.26100.8115 (WinBuild.160101.0800):Microsoft Corporation
+		fwpuclnt.dll:API de Modo de Usuário FWP/IPsec:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		gdi32full.dll:GDI Client DLL:10.0.26100.8246 (WinBuild.160101.0800):Microsoft Corporation
+		glfw.dll:GLFW 3.5.0 DLL:3.5.0:GLFW
+		icm32.dll:Microsoft Color Management Module (CMM):10.0.26100.2314 (WinBuild.160101.0800):Microsoft Corporation
+		inputhost.dll:InputHost:10.0.26100.8246 (WinBuild.160101.0800):Microsoft Corporation
+		java.dll:OpenJDK Platform binary:25.0.1.0:Eclipse Adoptium
+		java.exe:OpenJDK Platform binary:25.0.1.0:Eclipse Adoptium
+		jemalloc.dll
+		jimage.dll:OpenJDK Platform binary:25.0.1.0:Eclipse Adoptium
+		jli.dll:OpenJDK Platform binary:25.0.1.0:Eclipse Adoptium
+		jna3948902076312752741.dll:JNA native library:7.0.2:Java(TM) Native Access (JNA)
+		jvm.dll:OpenJDK 64-Bit server VM:25.0.1.0:Eclipse Adoptium
+		kernel.appcore.dll:AppModel API Host:10.0.26100.7920 (WinBuild.160101.0800):Microsoft Corporation
+		lwjgl.dll
+		lwjgl_opengl.dll
+		lwjgl_stb.dll
+		management.dll:OpenJDK Platform binary:25.0.1.0:Eclipse Adoptium
+		management_ext.dll:OpenJDK Platform binary:25.0.1.0:Eclipse Adoptium
+		mscms.dll:DLL do Sistema de Correspondência de Cores Microsoft:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		msvcp140.dll:Microsoft® C Runtime Library:14.40.33810.0:Microsoft Corporation
+		msvcp_win.dll:Microsoft® C Runtime Library:10.0.26100.8246 (WinBuild.160101.0800):Microsoft Corporation
+		msvcrt.dll:Windows NT CRT DLL:7.0.26100.8246 (WinBuild.160101.0800):Microsoft Corporation
+		mswsock.dll:Provedor de serviços do Microsoft Windows Sockets 2.0:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		napinsp.dll:Provedor de Correção de Nomeação de Emails:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		net.dll:OpenJDK Platform binary:25.0.1.0:Eclipse Adoptium
+		nio.dll:OpenJDK Platform binary:25.0.1.0:Eclipse Adoptium
+		nlansp_c.dll:NLA Namespace Service Provider DLL:10.0.26100.8115 (WinBuild.160101.0800):Microsoft Corporation
+		ntdll.dll:DLL de nível do NT:10.0.26100.8115 (WinBuild.160101.0800):Microsoft Corporation
+		ole32.dll:Microsoft OLE para Windows:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		opengl32.dll:OpenGL Client DLL:10.0.26100.8115 (WinBuild.160101.0800):Microsoft Corporation
+		pdh.dll:DLL auxiliar de dados de desempenho do Windows:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		perfos.dll:DLL de objetos de desempenho de sistema do Windows:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		perfproc.dll:DLL de objetos de desempenho de processo do sistema Windows:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		pfclient.dll:SysMain Client:10.0.26100.4202 (WinBuild.160101.0800):Microsoft Corporation
+		profapi.dll:User Profile Basic API:10.0.26100.8115 (WinBuild.160101.0800):Microsoft Corporation
+		rasadhlp.dll:Remote Access AutoDial Helper:10.0.26100.7920 (WinBuild.160101.0800):Microsoft Corporation
+		rsaenh.dll:Microsoft Enhanced Cryptographic Provider:10.0.26100.1 (WinBuild.160101.0800):Microsoft Corporation
+		sechost.dll:Host for SCM/SDDL/LSA Lookup APIs:10.0.26100.1 (WinBuild.160101.0800):Microsoft Corporation
+		shlwapi.dll:Biblioteca de utilitário abreviado para Shell:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		textinputframework.dll:"TextInputFramework.DYNLINK":10.0.26100.8115 (WinBuild.160101.0800):Microsoft Corporation
+		ucrtbase.dll:Microsoft® C Runtime Library:10.0.26100.8246 (WinBuild.160101.0800):Microsoft Corporation
+		uxtheme.dll:Biblioteca UxTheme Microsoft:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		vcruntime140_1.dll:Microsoft® C Runtime Library:14.40.33810.0:Microsoft Corporation
+		verify.dll:OpenJDK Platform binary:25.0.1.0:Eclipse Adoptium
+		win32u.dll:Win32u:10.0.26100.8246 (WinBuild.160101.0800):Microsoft Corporation
+		windows.staterepositorycore.dll:Windows StateRepository API Core:10.0.26100.8115 (WinBuild.160101.0800):Microsoft Corporation
+		windows.storage.dll:API de Armazenamento Microsoft WinRT:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		winrnr.dll:LDAP RnR Provider DLL:10.0.26100.8115 (WinBuild.160101.0800):Microsoft Corporation
+		wintypes.dll:DLL dos Tipos de Base do Windows:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		wshbth.dll:Windows Sockets Helper DLL:10.0.26100.5074 (WinBuild.160101.0800):Microsoft Corporation
+		xinput1_4.dll:API do Controlador Comum da Microsoft:10.0.26100.7015 (WinBuild.160101.0800):Microsoft Corporation
+		zip.dll:OpenJDK Platform binary:25.0.1.0:Eclipse Adoptium
+Stacktrace:
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.main.Main.main(Main.java:118) [minecraft-patched-26.1.2.42-beta.jar:?] {}
+	at net.neoforged.fml.startup.Client.main(Client.java:19) [loader-11.0.13.jar:11.0] {}
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[?:?] {}
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[?:?] {}
+	at net.neoforged.devlaunch.Main.main(Main.java:57) [DevLaunch-1.0.2.jar:?] {}
+
+
+-- System Details --
+Details:
+	Minecraft Version: 26.1.2
+	Minecraft Version ID: 26.1.2
+	Operating System: Windows 11 (amd64) version 10.0
+	Java Version: 25.0.1, Eclipse Adoptium
+	Java VM Version: OpenJDK 64-Bit Server VM (mixed mode, sharing), Eclipse Adoptium
+	Memory: 155691512 bytes (148 MiB) / 352321536 bytes (336 MiB) up to 4127195136 bytes (3936 MiB)
+	Memory (heap): init: 246MiB, used: 187MiB, committed: 336MiB, max: 3936MiB
+	Memory (non-head): init: 007MiB, used: 091MiB, committed: 095MiB, max: 000MiB
+	CPUs: 16
+	Processor Vendor: AuthenticAMD
+	Processor Name: AMD Ryzen 7 5700G with Radeon Graphics         
+	Identifier: AuthenticAMD Family 25 Model 80 Stepping 0
+	Microarchitecture: Zen 3
+	Frequency (GHz): 3.79
+	Number of physical packages: 1
+	Number of physical CPUs: 8
+	Number of logical CPUs: 16
+	Graphics card #0 name: AMD Radeon(TM) Graphics
+	Graphics card #0 vendor: Advanced Micro Devices, Inc.
+	Graphics card #0 VRAM (MiB): 512.00
+	Graphics card #0 deviceId: VideoController1
+	Graphics card #0 versionInfo: 31.0.21924.61
+	Graphics card #1 name: NVIDIA GeForce GTX 1050 Ti
+	Graphics card #1 vendor: NVIDIA
+	Graphics card #1 VRAM (MiB): 4096.00
+	Graphics card #1 deviceId: VideoController2
+	Graphics card #1 versionInfo: 32.0.15.7640
+	Memory slot #0 capacity (MiB): 8192.00
+	Memory slot #0 clockSpeed (GHz): 2.67
+	Memory slot #0 type: DDR4
+	Memory slot #1 capacity (MiB): 8192.00
+	Memory slot #1 clockSpeed (GHz): 2.67
+	Memory slot #1 type: DDR4
+	Virtual memory max (MiB): 28027.79
+	Virtual memory used (MiB): 18341.81
+	Swap memory total (MiB): 12288.00
+	Swap memory used (MiB): 200.72
+	Space in storage for jna.tmpdir (MiB): <path not set>
+	Space in storage for org.lwjgl.system.SharedLibraryExtractPath (MiB): <path not set>
+	Space in storage for io.netty.native.workdir (MiB): <path not set>
+	Space in storage for java.io.tmpdir (MiB): available: 50673.46, total: 243302.00
+	Space in storage for workdir (MiB): available: 50673.46, total: 243302.00
+	JVM Flags: 0 total; 
+	Debug Flags: 0 total; 
+	Launched Version: 26.1.2.42-beta
+	Backend library: LWJGL version 3.4.1+2
+	Backend API: Unknown
+	Window size: <not initialized>
+	GFLW Platform: win32
+	Render Extensions: <no renderer available>
+	GL debug messages: <no renderer available>
+	Is Modded: Definitely; Client brand changed to 'neoforge'
+	Universe: 404
+	Type: Client
+	Locale: pt_BR
+	System encoding: Cp1252
+	File encoding: UTF-8
+	CPU: 16x AMD Ryzen 7 5700G with Radeon Graphics 
+	Class Processors: 
+		00,00%: neoforge:neoforge_dev_dist_cleaner
+		00,00%: neoforge:computing_frames (marker)
+		00,00%: neoforge:runtime_enum_extender
+		07,33%: neoforge:access_transformer
+		00,81%: neoforge:mixin
+		00,00%: neoforge:simple_processors_default (marker)
+		00,04%: neoforge.coremods:field_to_getter.net.minecraft.world.level.biome.biome
+		00,04%: neoforge.coremods:field_to_getter.net.minecraft.world.level.block.flowerpotblock
+		00,00%: neoforge.coremods:field_to_getter.net.minecraft.world.level.levelgen.structure.structure
+		00,35%: neoforge.coremods:method_redirector

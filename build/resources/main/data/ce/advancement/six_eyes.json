@@ -1,0 +1,24 @@
+{
+  "display": {
+    "icon": {
+      "id": "ce:cursed_energy"
+    },
+    "title": "Six Eyes",
+    "description": "Awaken the Six Eyes.",
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+
+  "criteria": {
+    "six_eyes": {
+      "trigger": "minecraft:tick",
+      "conditions": {
+        "player": {
+          "nbt": "{Tags:[\"six_eyes\"]}"
+        }
+      }
+    }
+  }
+}

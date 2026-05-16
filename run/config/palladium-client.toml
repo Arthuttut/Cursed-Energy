@@ -1,0 +1,12 @@
+#Enabled additional utilities for addon developers
+dev_mode = true
+#Position of the ability bar on your screen
+#Allowed Values: TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT
+ability_bar_alignment = "TOP_LEFT"
+#Whether to position the keybinds in the ability inside or outside of the icons
+#Allowed Values: INSIDE, OUTSIDE
+ability_bar_key_bind_display = "INSIDE"
+#Whether to remove the experimental feature warning upon opening worlds
+hide_experimental_warning = true
+#This options fixes the weird camera movements when being small
+scale_camera_fix = true

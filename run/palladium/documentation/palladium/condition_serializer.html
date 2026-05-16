@@ -1,0 +1,2372 @@
+<html>
+<head>
+<title>
+Conditions</title>
+<style>
+table{font-family:arial, sans-serif;border-collapse:collapse;}
+td,th{border:1px solid #666666;text-align:left;padding:8px;min-width:45px;}
+th{background-color:#CCCCCC;}
+p{margin:0;}
+tr:nth-child(even){background-color:#D8D8D8;}
+tr:nth-child(odd){background-color:#EEEEEE;}
+td.true{background-color:#72FF85AA;}
+td.false{background-color:#FF6666AA;}
+td.other{background-color:#42A3FFAA;}
+td.error{color:#FF0000;}
+th,td.true,td.false,td.other{text-align:center;}pre{outline:1px solid #ccc;padding:5px;margin:5px;} .string{color:green;} .number{color:cornflowerblue;} .boolean{color:darkorange;} .null{color:orangered;} .key{color:purple;}hr { height: 5px; background-color: black }</style>
+<link rel="shortcut icon" type="image/x-icon" href="https://i.imgur.com/3sx4xJf.png">
+
+<style>
+.json-block { background-color: lightgray; display: inline-block; border: 5px solid darkgray; padding: 10px }</style>
+</head>
+<body>
+<h1>
+Conditions</h1>
+<hr>
+
+<p>
+<h2>
+Overview</h2>
+<h3>
+Palladium</h3>
+<ul>
+<li>
+<a href="#palladium:ability_animation_timer_value">
+Ability Animation Timer Value</a>
+</li>
+<li>
+<a href="#palladium:ability_enabled">
+Ability enabled</a>
+</li>
+<li>
+<a href="#palladium:ability_first_tick">
+Ability on First Tick</a>
+</li>
+<li>
+<a href="#palladium:ability_last_tick">
+Ability on Last Tick</a>
+</li>
+<li>
+<a href="#palladium:ability_on_cooldown">
+Ability on Cooldown</a>
+</li>
+<li>
+<a href="#palladium:ability_ticks">
+Ability Ticks</a>
+</li>
+<li>
+<a href="#palladium:ability_type_enabled">
+Ability Type enabled</a>
+</li>
+<li>
+<a href="#palladium:ability_type_unlocked">
+Ability Type unlocked</a>
+</li>
+<li>
+<a href="#palladium:ability_unlocked">
+Ability unlocked</a>
+</li>
+<li>
+<a href="#palladium:and">
+AND</a>
+</li>
+<li>
+<a href="#palladium:brightness_at_position">
+Brightness at Position</a>
+</li>
+<li>
+<a href="#palladium:command_result">
+Command Result</a>
+</li>
+<li>
+<a href="#palladium:crouching">
+Crouching</a>
+</li>
+<li>
+<a href="#palladium:customization_selected">
+Customization Selected</a>
+</li>
+<li>
+<a href="#palladium:day">
+Day</a>
+</li>
+<li>
+<a href="#palladium:dimension">
+Dimension</a>
+</li>
+<li>
+<a href="#palladium:empty_slot">
+Empty Slot</a>
+</li>
+<li>
+<a href="#palladium:energy_bar">
+Energy Bar</a>
+</li>
+<li>
+<a href="#palladium:entity_scale">
+Entity Scale</a>
+</li>
+<li>
+<a href="#palladium:entity_type">
+Entity Type</a>
+</li>
+<li>
+<a href="#palladium:false">
+False</a>
+</li>
+<li>
+<a href="#palladium:has_effect">
+Has Effect</a>
+</li>
+<li>
+<a href="#palladium:has_movement_input">
+Has Movement Input</a>
+</li>
+<li>
+<a href="#palladium:has_power">
+Has Power</a>
+</li>
+<li>
+<a href="#palladium:has_tag">
+Has Tag</a>
+</li>
+<li>
+<a href="#palladium:health">
+Health</a>
+</li>
+<li>
+<a href="#palladium:in_lava">
+In Lava</a>
+</li>
+<li>
+<a href="#palladium:in_water">
+In Water</a>
+</li>
+<li>
+<a href="#palladium:is_creative_flying">
+Is Creative Flying</a>
+</li>
+<li>
+<a href="#palladium:is_gliding">
+Is Gliding</a>
+</li>
+<li>
+<a href="#palladium:is_in_rain">
+Is in Rain</a>
+</li>
+<li>
+<a href="#palladium:is_in_water_or_rain">
+Is in Water or Rain</a>
+</li>
+<li>
+<a href="#palladium:is_moving">
+Is moving</a>
+</li>
+<li>
+<a href="#palladium:is_on_fire">
+Is on Fire</a>
+</li>
+<li>
+<a href="#palladium:is_swimming">
+Is Swimming</a>
+</li>
+<li>
+<a href="#palladium:is_under_water">
+Is under Water</a>
+</li>
+<li>
+<a href="#palladium:is_using_flight_type">
+Is using Flight Type</a>
+</li>
+<li>
+<a href="#palladium:is_wall_climbing">
+Is Wall Climbing</a>
+</li>
+<li>
+<a href="#palladium:item_in_slot">
+Item in Slot</a>
+</li>
+<li>
+<a href="#palladium:item_open">
+Item Open</a>
+</li>
+<li>
+<a href="#palladium:mod_loaded">
+Mod loaded</a>
+</li>
+<li>
+<a href="#palladium:molang">
+MoLang</a>
+</li>
+<li>
+<a href="#palladium:moon_phase">
+Moon Phase</a>
+</li>
+<li>
+<a href="#palladium:night">
+Night</a>
+</li>
+<li>
+<a href="#palladium:not">
+NOT</a>
+</li>
+<li>
+<a href="#palladium:number_comparison">
+Number Comparison</a>
+</li>
+<li>
+<a href="#palladium:number_data_attachment">
+Number Data Attachment</a>
+</li>
+<li>
+<a href="#palladium:objective_score">
+Objective Score</a>
+</li>
+<li>
+<a href="#palladium:on_ground">
+On Ground</a>
+</li>
+<li>
+<a href="#palladium:or">
+OR</a>
+</li>
+<li>
+<a href="#palladium:pose">
+Pose</a>
+</li>
+<li>
+<a href="#palladium:slim_armor_model">
+Slim Armor Model</a>
+</li>
+<li>
+<a href="#palladium:sprinting">
+Sprinting</a>
+</li>
+<li>
+<a href="#palladium:string_comparison">
+String Comparison</a>
+</li>
+<li>
+<a href="#palladium:true">
+True</a>
+</li>
+<li>
+<a href="#palladium:wears_suit_set">
+Wears Suit Set</a>
+</li>
+<li>
+<a href="#palladium:wide_armor_model">
+Wide Armor Model</a>
+</li>
+</ul>
+</p>
+<hr>
+
+<div>
+<h2 id="palladium:ability_animation_timer_value">
+Ability Animation Timer Value</h2>
+<p>
+Checks if the given animation timer in an ability has a certain value.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+min</td>
+<td>
+Integer | Time String ("40s", "2m", etc.)</td>
+<td>
+The minimum required value of the current animation timer value of the ability</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+max</td>
+<td>
+Integer | Time String ("40s", "2m", etc.)</td>
+<td>
+The maximum required value of the current animation timer value of the ability</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+ability</td>
+<td>
+Ability Reference</td>
+<td>
+The ability that is being checked on.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:ability_animation_timer_value","ability":"example:power#ability_key","min":5,"max":10}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:ability_enabled">
+Ability enabled</h2>
+<p>
+Checks if the ability is enabled.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+ability</td>
+<td>
+Ability Reference</td>
+<td>
+The ability that needs to be enabled</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:ability_enabled","ability":"example:power#ability_key"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:ability_first_tick">
+Ability on First Tick</h2>
+<p>
+Checks if the ability is on its first tick.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+ability</td>
+<td>
+Ability Reference</td>
+<td>
+The ability that needs to be on its first tick.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:ability_first_tick","ability":"example:power#ability_key"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:ability_last_tick">
+Ability on Last Tick</h2>
+<p>
+Checks if the ability was just on its last tick.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+ability</td>
+<td>
+Ability Reference</td>
+<td>
+The ability that needs to be on its last tick.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:ability_last_tick","ability":"example:power#ability_key"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:ability_on_cooldown">
+Ability on Cooldown</h2>
+<p>
+Checks if the ability is currently on cooldown. If the power is not null, it will look for the ability in the specified power. If the power is null, it will look for the ability in the current power.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+ability</td>
+<td>
+Ability Reference</td>
+<td>
+The ability that is being checked on.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:ability_on_cooldown","ability":"example:power#ability_key"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:ability_ticks">
+Ability Ticks</h2>
+<p>
+Checks if the ability has been enabled for a certain amount of ticks.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+min</td>
+<td>
+Integer | Time String ("40s", "2m", etc.)</td>
+<td>
+The minimum required value of the current tick count of the ability.</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+max</td>
+<td>
+Integer | Time String ("40s", "2m", etc.)</td>
+<td>
+The maximum required value of the current tick count of the ability.</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+ability</td>
+<td>
+Ability Reference</td>
+<td>
+The ability that is being checked on.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:ability_ticks","ability":"example:power#ability_key","min":5,"max":10}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:ability_type_enabled">
+Ability Type enabled</h2>
+<p>
+Checks if an ability of a certain type is enabled.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+ability_type</td>
+<td>
+Ability Type ID(s) / Tag(s)</td>
+<td>
+The ID(s) or tag(s) of the ability type that needs to be enabled.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:ability_type_enabled","ability_type":"palladium:dummy"}</pre>
+<pre class="json-snippet">
+{"type":"palladium:ability_type_enabled","ability_type":["palladium:dummy","palladium:command"]}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:ability_type_unlocked">
+Ability Type unlocked</h2>
+<p>
+Checks if an ability of a certain type is unlocked.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+ability_type</td>
+<td>
+Ability Type ID(s) / Tag(s)</td>
+<td>
+The ID(s) or tag(s) of the ability type that needs to be unlocked.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:ability_type_unlocked","ability_type":"palladium:dummy"}</pre>
+<pre class="json-snippet">
+{"type":"palladium:ability_type_unlocked","ability_type":["palladium:dummy","palladium:command"]}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:ability_unlocked">
+Ability unlocked</h2>
+<p>
+Checks if the ability is unlocked.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+ability</td>
+<td>
+Ability Reference</td>
+<td>
+The ability that needs to be unlocked</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:ability_unlocked","ability":"example:power#ability_key"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:and">
+AND</h2>
+<p>
+Allows you to group multiple conditions into one using the AND logic. All of the given conditions must be true for this one to be true aswell.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+conditions</td>
+<td>
+Condition | Condition[]</td>
+<td>
+List of conditions</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+[{"type":"palladium:crouching"},{"type":"palladium:day"}]</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:brightness_at_position">
+Brightness at Position</h2>
+<p>
+Checks if the brightness at the given position is within the given range.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+min</td>
+<td>
+Integer (0 ~ 16)</td>
+<td>
+The minimum required value of the brightness value (Value between 0-16).</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+0</td>
+</tr>
+<tr>
+<td>
+max</td>
+<td>
+Integer (0 ~ 16)</td>
+<td>
+The maximum required value of the brightness value.</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+16</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:brightness_at_position","min":6,"max":7}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:command_result">
+Command Result</h2>
+<p>
+Executes command(s) and compares the output to a number.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+log</td>
+<td>
+Boolean</td>
+<td>
+Whether or not the command result is being logged.</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+compare_to</td>
+<td>
+Integer</td>
+<td>
+The number it's being compared to.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+command</td>
+<td>
+String | String[]</td>
+<td>
+The command(s) that are being executed.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+operator</td>
+<td>
+"=" | "!=" | "<" | ">" | "<=" | ">="</td>
+<td>
+The used number operator.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:command_result","command":"say Hello World","operator":"=","compare_to":5}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:crouching">
+Crouching</h2>
+<p>
+Checks if the entity is crouching.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:crouching"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:customization_selected">
+Customization Selected</h2>
+<p>
+Checks if the given customization is currently selected by the entity.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+customization</td>
+<td>
+Customization ID(s) / Tag(s)</td>
+<td>
+ID(s) or tag(s) of the required flight type.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:customization_selected","customization":"#example:customization_tag"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:day">
+Day</h2>
+<p>
+Check if it's currently daytime</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:day"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:dimension">
+Dimension</h2>
+<p>
+Tests for the current dimension.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+dimension</td>
+<td>
+Dimension ID</td>
+<td>
+ID of the required dimension.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:dimension","dimension":"minecraft:overworld"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:empty_slot">
+Empty Slot</h2>
+<p>
+Checks if the given slot of an entity is empty</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+slot</td>
+<td>
+"mainhand" | "offhand" | "head" | "chest" | "legs" | "feet" | "body" | "curios:head" | "curios:necklace"</td>
+<td>
+The slot that is being looked into.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:empty_slot","slot":"chest"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:energy_bar">
+Energy Bar</h2>
+<p>
+Checks if an energy bar has a required amount in it.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+min</td>
+<td>
+Integer (>= 0)</td>
+<td>
+The minimum required value of the energy bar.</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+max</td>
+<td>
+Integer (>= 0)</td>
+<td>
+The maximum required value of the energy bar.</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+energy_bar</td>
+<td>
+Energy Bar Reference</td>
+<td>
+The energy bar is being looked into.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:energy_bar","energy_bar":"example:power#energy_bar_key","min":5,"max":10}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:entity_scale">
+Entity Scale</h2>
+<p>
+Checks the current scale of the entity.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+min</td>
+<td>
+Float (>= 0.0)</td>
+<td>
+The minimum required scale of the entity.</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+max</td>
+<td>
+Integer (>= 0)</td>
+<td>
+The maximum required scale of the entity.</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:entity_scale","min":1.0,"max":2.0}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:entity_type">
+Entity Type</h2>
+<p>
+Checks if the entity is of a specific entity type</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+entity_type</td>
+<td>
+Entity Type ID(s) / Tag(s)</td>
+<td>
+IDs or tags of the required entity type.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:entity_type","entity_type":"minecraft:sheep"}</pre>
+<pre class="json-snippet">
+{"type":"palladium:entity_type","entity_type":{"type":"neoforge:or","values":["#minecraft:burn_in_daylight","minecraft:sheep"]}}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:false">
+False</h2>
+<p>
+It's just false. That's it.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+false</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:has_effect">
+Has Effect</h2>
+<p>
+Checks if the entity has a (potion) effect.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+effect</td>
+<td>
+Mob Effect ID(s) / Tag(s)</td>
+<td>
+IDs or tags of the required mob/potion effect</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:has_effect","effect":"minecraft:slowness"}</pre>
+<pre class="json-snippet">
+{"type":"palladium:has_effect","effect":["minecraft:slowness","minecraft:mining_fatigue"]}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:has_movement_input">
+Has Movement Input</h2>
+<p>
+Checks if a player is currently pressing keys to move.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:has_movement_input"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:has_power">
+Has Power</h2>
+<p>
+Checks if the entity has specified power.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+power</td>
+<td>
+Power ID(s) / Tag(s)</td>
+<td>
+IDs or tags of power that need to be on the entity.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:has_power","power":"#palladium:is_mechanical"}</pre>
+<pre class="json-snippet">
+{"type":"palladium:has_power","power":{"type":"neoforge:or","values":["#palladium:is_genetic","#palladium:is_magical"]}}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:has_tag">
+Has Tag</h2>
+<p>
+Checks if the entity has a specific tag. These tags are added to entities via /tag command.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+tag</td>
+<td>
+String</td>
+<td>
+The tag that needs to be on the entity</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:has_tag","tag":"example_tag"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:health">
+Health</h2>
+<p>
+Checks if the entity has a certain amount of health.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+min</td>
+<td>
+Float (>= 0.0)</td>
+<td>
+The minimum required health of the entity.</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+max</td>
+<td>
+Float (>= 0.0)</td>
+<td>
+The maximum required health of the entity.</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:health","min":5.0,"max":10.0}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:in_lava">
+In Lava</h2>
+<p>
+Checks if the entity is in lava.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:in_lava"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:in_water">
+In Water</h2>
+<p>
+Checks if the entity is in water.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:in_water"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:is_creative_flying">
+Is Creative Flying</h2>
+<p>
+Checks if the entity is currently flying in creative mode.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:is_creative_flying"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:is_gliding">
+Is Gliding</h2>
+<p>
+Checks if the entity is currently gliding/flying with an elytra.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:is_gliding"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:is_in_rain">
+Is in Rain</h2>
+<p>
+Checks if the entity is currently in rain.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:is_in_rain"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:is_in_water_or_rain">
+Is in Water or Rain</h2>
+<p>
+Checks if the entity is currently in water or rain.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:is_in_water_or_rain"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:is_moving">
+Is moving</h2>
+<p>
+Checks if the entity is currently moving.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:is_moving"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:is_on_fire">
+Is on Fire</h2>
+<p>
+Checks if the entity is currently on fire.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:is_on_fire"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:is_swimming">
+Is Swimming</h2>
+<p>
+Checks if the entity is swimming.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:is_swimming"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:is_under_water">
+Is under Water</h2>
+<p>
+Checks if the entity is currently under water.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:is_under_water"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:is_using_flight_type">
+Is using Flight Type</h2>
+<p>
+Checks if the given entity is currently flying using the specified flight type.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+flight_type</td>
+<td>
+Flight Type ID(s) / Tag(s)</td>
+<td>
+ID(s) or tag(s) of the required flight type.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:is_using_flight_type","flight_type":"palladium:propulsion"}</pre>
+<pre class="json-snippet">
+{"type":"palladium:is_using_flight_type","flight_type":["palladium:propulsion","palladium:web_swinging"]}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:is_wall_climbing">
+Is Wall Climbing</h2>
+<p>
+Checks if the entity is currently wall climbing.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:is_wall_climbing"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:item_in_slot">
+Item in Slot</h2>
+<p>
+Checks if the given item is in the given slot</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+item</td>
+<td>
+Ingredient / Item</td>
+<td>
+Ingredient definition for the required item stack.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+slot</td>
+<td>
+"mainhand" | "offhand" | "head" | "chest" | "legs" | "feet" | "body" | "curios:head" | "curios:necklace"</td>
+<td>
+The slot that is being looked into.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:item_in_slot","item":"minecraft:stick","slot":"chest"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:item_open">
+Item Open</h2>
+<p>
+Checks if an item is opened.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+slot</td>
+<td>
+"mainhand" | "offhand" | "head" | "chest" | "legs" | "feet" | "body" | "curios:head" | "curios:necklace"</td>
+<td>
+Slot to check for. If none specified, it will use the slot from the current context (if given).</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:item_open"}</pre>
+<pre class="json-snippet">
+{"type":"palladium:item_open","slot":"chest"}</pre>
+<pre class="json-snippet">
+{"type":"palladium:item_open","slot":"curios:head"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:mod_loaded">
+Mod loaded</h2>
+<p>
+Checks if the specified mod was loaded into the game.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+mod_id</td>
+<td>
+String</td>
+<td>
+The mod id that is being looked for.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:mod_loaded","mod_id":"example_mod_id"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:molang">
+MoLang</h2>
+<p>
+Uses a MoLang query as a condition</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+"query.is_moving()"</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:moon_phase">
+Moon Phase</h2>
+<p>
+Checks and compares the current moon phase in the world.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+moon_phase</td>
+<td>
+"full_moon" | "waning_gibbous" | "third_quarter" | "waning_crescent" | "new_moon" | "waxing_crescent" | "first_quarter" | "waxing_gibbous"</td>
+<td>
+Moon phase(s) that is/are required</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:moon_phase","moon_phase":"full_moon"}</pre>
+<pre class="json-snippet">
+{"type":"palladium:moon_phase","moon_phase":["new_moon","third_quarter"]}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:night">
+Night</h2>
+<p>
+Check if it's currently nighttime</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:night"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:not">
+NOT</h2>
+<p>
+Allows you to group multiple conditions into one using the NOT logic. None of the given conditions must be true for this one to be true aswell.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+conditions</td>
+<td>
+Condition | Condition[]</td>
+<td>
+List of conditions</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:not","conditions":[{"type":"palladium:crouching"},{"type":"palladium:day"}]}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:number_comparison">
+Number Comparison</h2>
+<p>
+Compares two number values using the given operator.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+value</td>
+<td>
+(Dynamic) Value</td>
+<td>
+The main value in the comparison</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+operator</td>
+<td>
+"=" | "!=" | "<" | ">" | "<=" | ">="</td>
+<td>
+The comparison operator being used</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+target</td>
+<td>
+(Dynamic) Value</td>
+<td>
+The value that the main value is being compared against</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:number_comparison","value":5,"operator":">","target":3}</pre>
+<pre class="json-snippet">
+{"type":"palladium:number_comparison","value":{"type":"palladium:entity_tick_count"},"operator":"<=","target":20}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:number_data_attachment">
+Number Data Attachment</h2>
+<p>
+Checks if the value a number data attachment is within a given range.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+min</td>
+<td>
+Double</td>
+<td>
+The minimum required value of the data attachment.</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+attachment</td>
+<td>
+Data Attachment ID</td>
+<td>
+The ID of the data attachment.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+max</td>
+<td>
+Double</td>
+<td>
+The maximum required value of the data attachment.</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:number_data_attachment","attachment":"example:number_attachment_id","min":5.0,"max":10.0}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:objective_score">
+Objective Score</h2>
+<p>
+Checks if the player has a score in a specific objective.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+min</td>
+<td>
+Integer</td>
+<td>
+Minimum required score value.</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+max</td>
+<td>
+Integer</td>
+<td>
+Maximum required score value.</td>
+<td style="background-color: lightcoral">
+false</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+objective</td>
+<td>
+String</td>
+<td>
+Name of the scoreboard objective.</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:objective_score","objective":"example_objective","min":5,"max":10}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:on_ground">
+On Ground</h2>
+<p>
+Checks if the entity is on the ground.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:on_ground"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:or">
+OR</h2>
+<p>
+Allows you to group multiple conditions into one using the OR logic. At least one of the given conditions must be true for this one to be true aswell.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+conditions</td>
+<td>
+Condition | Condition[]</td>
+<td>
+List of conditions</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:or","conditions":[{"type":"palladium:crouching"},{"type":"palladium:day"}]}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:pose">
+Pose</h2>
+<p>
+Checks if the entity is in a specific pose.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+pose</td>
+<td>
+"standing" | "fall_flying" | "sleeping" | "swimming" | "spin_attack" | "crouching" | "long_jumping" | "dying" | "croaking" | "using_tongue" | "sitting" | "roaring" | "sniffing" | "emerging" | "digging" | "sliding" | "shooting" | "inhaling"</td>
+<td>
+The required pose(s).</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:pose","pose":"crouching"}</pre>
+<pre class="json-snippet">
+{"type":"palladium:pose","pose":["sleeping","sitting"]}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:slim_armor_model">
+Slim Armor Model</h2>
+<p>
+Checks if the entity has the slim armor model (Alex). Returns false if the entity is not a player or if this condition is being checked sever-side.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:slim_armor_model"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:sprinting">
+Sprinting</h2>
+<p>
+Checks if the entity is currently sprinting.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:sprinting"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:string_comparison">
+String Comparison</h2>
+<p>
+Compares two string values using the given operator.</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+value</td>
+<td>
+(Dynamic) Value</td>
+<td>
+The main value in the comparison</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+operator</td>
+<td>
+"equals" | "equals_ignore_case" | "starts_with" | "ends_with" | "contains" | "contains_ignore_case"</td>
+<td>
+The comparison operator being used</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+<tr>
+<td>
+target</td>
+<td>
+(Dynamic) Value</td>
+<td>
+The value that the main value is being compared against</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:string_comparison","value":"example","operator":"contains","target":"amp"}</pre>
+<pre class="json-snippet">
+{"type":"palladium:string_comparison","value":{"type":"palladium:string_data_attachment","attachment":"example:string_attachment_id"},"operator":"equals","target":"example_content"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:true">
+True</h2>
+<p>
+It's just true. That's it.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+true</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:wears_suit_set">
+Wears Suit Set</h2>
+<p>
+Checks if the entity is wearing the specified suit set</p>
+<h3>
+Settings:</h3>
+<table>
+<thead>
+<tr>
+<th>
+Setting</th>
+<th>
+Type</th>
+<th>
+Description</th>
+<th>
+Required</th>
+<th>
+Fallback Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+suit_set</td>
+<td>
+Suit Set ID</td>
+<td>
+ID of the needed suit set</td>
+<td style="background-color: lightgreen">
+true</td>
+<td>
+/</td>
+</tr>
+</tbody>
+</table>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:wears_suit_set","suit_set":"example:suit_set"}</pre>
+</div>
+<hr>
+
+<div>
+<h2 id="palladium:wide_armor_model">
+Wide Armor Model</h2>
+<p>
+Checks if the entity has the wide armor model (Steve). Returns false if the entity is not a player or if this condition is being checked sever-side.</p>
+<h3>
+Examples:</h3>
+<pre class="json-snippet">
+{"type":"palladium:wide_armor_model"}</pre>
+</div>
+<script>
+function syntaxHighlight(json) {
+        json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+            var cls = 'number';
+            if (/^"/.test(match)) {
+                if (/:$/.test(match)) {
+                    cls = 'key';
+                } else {
+                    cls = 'string';
+                }
+            } else if (/true|false/.test(match)) {
+                cls = 'boolean';
+            } else if (/null/.test(match)) {
+                cls = 'null';
+            }
+            return '<span class="' + cls + '">' + match + '</span>';
+        });
+    }
+
+    const elements = document.getElementsByClassName("json-snippet");
+    const amount = elements.length;
+    for (let i = 0; i < amount; i++) {
+        const element = elements[0];
+        const div = document.createElement("pre");
+        div.innerHTML = syntaxHighlight(JSON.stringify(JSON.parse(element.innerText), undefined, 4));
+        element.parentNode.replaceChild(div, element);
+    }</script>
+</body>
+</html>

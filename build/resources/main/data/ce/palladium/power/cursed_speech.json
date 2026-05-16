@@ -1,0 +1,30 @@
+{
+    "name": "Cursed Speech",
+    "icon": "ce:textures/icon/techniques/cursed_speech.png",
+    "parent": "ce:cursed_energy_control",
+    "abilities": {
+        "dont_move": {
+            "type": "palladium:command",
+            "properties": {
+                "title": "Don't Move",
+                "icon": {
+                    "type": "palladium:texture",
+                    "texture": "ce:textures/icon/techniques/dont_move.png"
+                },
+                "color": "cyan",
+                "list_index": 0
+            },
+            "first_tick_commands": [
+                "execute as @s[tag=!six_eyes] if score @s cursed_energy matches 350.. run function ce:cs_dont_move",
+                "execute as @s[tag=six_eyes] if score @s cursed_energy matches 120.. run function ce:cs_dont_move"
+            ],
+            "state": {
+                "enabling": {
+                    "type": "palladium:key_bind",
+                    "behaviour": "activation",
+                    "cooldown": 65
+                }
+            }
+        }
+    }
+}

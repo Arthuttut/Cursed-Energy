@@ -1,0 +1,42 @@
+{
+  "name": "Paralised",
+  "icon": "minecraft:feather",
+  "abilities": {
+    "paralised": {
+      "type": "palladium:command",
+      "commands": [
+        "scoreboard objectives add ce_speech_timer dummy",
+        "scoreboard players add @s ce_speech_timer 1",
+        "execute if score @s ce_speech_timer matches 100.. run palladium superpower remove ce:paralised @s"
+      ],
+      "first_tick_commands": [
+        "data merge entity @s {NoAI:1b}",
+        "scoreboard players set @s ce_speech_timer 0"
+      ],
+      "last_tick_commands": [
+        "data merge entity @s {NoAI:0b}",
+        "scoreboard players reset @s ce_speech_timer"
+      ]
+    },
+    "attributes": {
+      "type": "palladium:attribute_modifier",
+      "modifiers": [
+        {
+          "attribute": "minecraft:movement_speed",
+          "amount": 0,
+          "operation": "add_multiplied_base"
+        },
+        {
+          "attribute": "minecraft:jump_strength",
+          "amount": 0,
+          "operation": "add_multiplied_base"
+        },
+        {
+          "attribute": "minecraft:attack_damage",
+          "amount": 0,
+          "operation": "add_multiplied_base"
+        }
+      ]
+    }
+  }
+}

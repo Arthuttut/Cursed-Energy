@@ -1,0 +1,30 @@
+--------------------------------------------------------------------------------
+
+Command-Line:
+ - C:\Program Files\Eclipse Adoptium\jdk-25.0.1.8-hotspot\bin\java.exe
+ - --sun-misc-unsafe-memory-access=allow
+ - -jar
+ - C:\Users\arthu\.gradle\caches\modules-2\files-2.1\io.codechicken\DiffPatch\2.0.0.36\5b32f9baa0c0371c0dc80a3b88794960af0c6b44\DiffPatch-2.0.0.36-all.jar
+ - C:\Users\arthu\.gradle\caches\neoformruntime\intermediate_results\patch_b4dd199b08136ecb63a34b018c2869fa38dbbc29_output.zip
+ - C:\Users\arthu\.gradle\caches\modules-2\files-2.1\net.neoforged\neoforge\26.1.2.42-beta\47508cb17b7a4724d591598aab7529f16d36f134\neoforge-26.1.2.42-beta-userdev.jar
+ - --prefix
+ - patches/
+ - --patch
+ - --archive
+ - ZIP
+ - --output
+ - ./output.zip
+ - --log-level
+ - WARN
+ - --mode
+ - OFFSET
+ - --archive-rejects
+ - ZIP
+ - --reject
+ - ./outputRejects.zip
+ - --base-path-prefix
+ - a/
+ - --modified-path-prefix
+ - b/
+--------------------------------------------------------------------------------
+

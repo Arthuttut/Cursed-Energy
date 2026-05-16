@@ -1,0 +1,43 @@
+{
+  "type": "palladium:compound",
+  "layers": [
+    {
+      "type": "palladium:render_layer",
+      "texture": "ce:textures/entity/black_divine_dog.png",
+      "state": {
+        "enabling": [
+          {
+            "type": "palladium:has_tag",
+            "tag": "black_divine_dog"
+          },
+          {
+            "type": "palladium:not",
+            "conditions": {
+              "type": "palladium:has_tag",
+              "tag": "white_divine_dog"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "palladium:render_layer",
+      "texture": "ce:textures/entity/white_divine_dog.png",
+      "state": {
+        "enabling": [
+          {
+            "type": "palladium:has_tag",
+            "tag": "white_divine_dog"
+          },
+          {
+            "type": "palladium:not",
+            "conditions": {
+              "type": "palladium:has_tag",
+              "tag": "black_divine_dog"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

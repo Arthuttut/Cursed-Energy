@@ -1,0 +1,70 @@
+{
+    "name": "Limitless",
+    "icon": "ce:textures/icon/techniques/infinity.png",
+    "ability_bar_texture": "ce:textures/gui/ability_bars/limitless.png",
+    "parent": "ce:cursed_energy_control",
+    "abilities": {
+        "infinity": {
+            "type": "palladium:damage_immunity",
+            "properties": {
+                "title": "Infinity",
+                "icon": "ce:textures/icon/techniques/infinity.png",
+                "color": "cyan",
+                "list_index": 0
+            },
+            "damage_type": "#ce:all",
+            "state": {
+                "enabling": {
+                    "type": "palladium:key_bind",
+                    "behaviour": "toggle"
+                }
+            }
+        },
+        "fluid_walk": {
+            "type": "palladium:fluid_walking",
+            "properties": {
+                "hidden_in_gui": true
+            },
+            "fluid_tag": [
+                "#minecraft:water",
+                "#minecraft:lava"
+            ],
+            "state": {
+                "enabling": {
+                    "type": "palladium:ability_enabled",
+                    "ability": "ce:limitless#infinity"
+                }
+            }
+        },
+        "lapse_blue": {
+            "type": "palladium:dummy",
+            "properties": {
+                "title": "Lapse Blue",
+                "icon": "ce:textures/icon/techniques/lapse_blue.png",
+                "color": "cyan",
+                "list_index": 1
+            },
+            "state": {
+                "enabling": {
+                    "type": "palladium:key_bind",
+                    "behaviour": "toggle"
+                }
+            }
+        },
+                "lapse_red": {
+            "type": "palladium:dummy",
+            "properties": {
+                "title": "Lapse Red",
+                "icon": "ce:textures/icon/techniques/lapse_red.png",
+                "color": "red",
+                "list_index": 2
+            },
+            "state": {
+                "enabling": {
+                    "type": "palladium:key_bind",
+                    "behaviour": "toggle"
+                }
+            }
+        }
+    }
+}

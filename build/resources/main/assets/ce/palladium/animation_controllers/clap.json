@@ -1,0 +1,19 @@
+{
+  "initial_state": "default",
+  "states": {
+    "default": {
+      "transitions": {
+        "clap": {
+          "type": "palladium:ability_enabled",
+          "ability": "ce:boogie_woogie#boogie_woogie"
+        }
+      }
+    },
+    "clap": {
+      "animation": "ce:clap",
+      "transitions": {
+        "default": "palladium.any_animation_finished()"
+      }
+    }
+  }
+}

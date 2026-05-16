@@ -1,0 +1,30 @@
+{
+  "name": "Boogie Woogie",
+  "icon": "ce:textures/icon/techniques/boogie_woogie.png",
+  "parent": "ce:cursed_energy_control",
+    "animation_controller": {
+    "special": "ce:clap"
+  },
+  "abilities": {
+    "boogie_woogie": {
+      "type": "palladium:command",
+      "properties": {
+        "title": "Boogie Woogie",
+        "icon": "ce:textures/icon/techniques/boogie_woogie.png",
+        "list_index": 0,
+        "color": "cyan"
+      },
+      "first_tick_commands": [
+        "execute if score @s cursed_energy matches 80.. run function ce:swap",
+        "execute if score @s cursed_energy matches ..79 run playsound ce:swap master @a[distance=..20] ~ ~ ~ 1 1"
+      ],
+      "state": {
+        "enabling": {
+          "type": "palladium:key_bind",
+          "behaviour": "activation",
+          "cooldown": 5
+        }
+      }
+    }
+  }
+}
