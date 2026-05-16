@@ -1,25 +1,56 @@
+<div align="center">
 
-Installation information
-=======
+<img src="https://i.imgur.com/ygGMfZc.png" width="600">
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions provided by [GitHub](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+<br>
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
+[![YouTube](https://img.shields.io/badge/YouTube-Channel-red)](https://www.youtube.com/@hekopdcre)
+[![Discord](https://img.shields.io/badge/Discord-Join-5865F2)](https://discord.gg/69MDuWEkRz)
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
+</div>
 
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+---
 
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+# About
+
+A Simple JJK Mod that adds cursed energy and jujutsu techniques to Minecraft.  
+
+**WIP:** Cursed Energy, Boogie Woogie, Vessel, Shrine(Sukuna) and Projection Sorcery
+
+---
+
+# Features(WIP)
+
+- Cursed Energy
+- Boogie Woogie
+- Black Flash
+- Shrine
+- Ten Shadows
+- Limitless
+- Cursed Speech
+- Projection Sorcery
+- Comedian
+- Vessel
+- Celestial Restriction
+- Domains
+---
+
+# Requirements
+
+- NeoForge 26.1.2
+- PalladiumPreview 5.0.0
+- Player Animation Library 1.2.3
+
+---
+
+# Installation
+
+1. Install NeoForge
+2. Install Palladium and Player Animation Library
+3. Put the mod inside the `mods` folder
+
+---
+
+# Developer
+Made by Heko / Arthur, <br>
+obs: to change or add a technique for player use: palladium superpower add ce:technique that you want
