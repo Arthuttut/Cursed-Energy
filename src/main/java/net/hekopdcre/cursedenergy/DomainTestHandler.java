@@ -29,8 +29,7 @@ public class DomainTestHandler {
 
     private static final int RESTORE_BATCH_SIZE = 200;
 
-    private static final Identifier TEN_SHADOWS_POWER =
-            Identifier.parse("ce:ten_shadows");
+    private static final Identifier TEN_SHADOWS_POWER = Identifier.parse("ce:ten_shadows");
 
     private static final String EXPANSION_ABILITY = "expansion";
 
@@ -41,27 +40,32 @@ public class DomainTestHandler {
     private static final int[] SQUARES;
     static {
         SQUARES = new int[RADIUS + 1];
-        for (int i = 0; i <= RADIUS; i++) SQUARES[i] = i * i;
+        for (int i = 0; i <= RADIUS; i++)
+            SQUARES[i] = i * i;
     }
 
-    // Cache de BlockState — evita chamar defaultBlockState() milhares de vezes nos loops
-    private static final BlockState BS_CRYING_OBSIDIAN     = Blocks.CRYING_OBSIDIAN.defaultBlockState();
-    private static final BlockState BS_BLACKSTONE          = Blocks.BLACKSTONE.defaultBlockState();
+    // Cache de BlockState — evita chamar defaultBlockState() milhares de vezes nos
+    // loops
+    private static final BlockState BS_CRYING_OBSIDIAN = Blocks.CRYING_OBSIDIAN.defaultBlockState();
+    private static final BlockState BS_BLACKSTONE = Blocks.BLACKSTONE.defaultBlockState();
     private static final BlockState BS_POLISHED_BLACKSTONE = Blocks.POLISHED_BLACKSTONE.defaultBlockState();
-    private static final BlockState BS_BLACK_CONCRETE      = Blocks.BLACK_CONCRETE.defaultBlockState();
-    private static final BlockState BS_AIR                 = Blocks.AIR.defaultBlockState();
+    private static final BlockState BS_BLACK_CONCRETE = Blocks.BLACK_CONCRETE.defaultBlockState();
+    private static final BlockState BS_AIR = Blocks.AIR.defaultBlockState();
 
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        if (!(player.level() instanceof ServerLevel level)) return;
+        if (!(event.getEntity() instanceof ServerPlayer player))
+            return;
+        if (!(player.level() instanceof ServerLevel level))
+            return;
 
         UUID uuid = player.getUUID();
         boolean expansionActive = hasDomainExpansionEnabled(player);
 
         if (expansionActive) {
             ActiveDomain restoring = RESTORING_DOMAINS.remove(uuid);
-            if (restoring != null) restoring.restoreAll(level);
+            if (restoring != null)
+                restoring.restoreAll(level);
 
             ActiveDomain domain = ACTIVE_DOMAINS.get(uuid);
             if (domain == null) {
@@ -94,16 +98,20 @@ public class DomainTestHandler {
 
     @SubscribeEvent
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        if (!(player.level() instanceof ServerLevel level)) return;
+        if (!(event.getEntity() instanceof ServerPlayer player))
+            return;
+        if (!(player.level() instanceof ServerLevel level))
+            return;
 
         UUID uuid = player.getUUID();
 
         ActiveDomain active = ACTIVE_DOMAINS.remove(uuid);
-        if (active != null) active.restoreAll(level);
+        if (active != null)
+            active.restoreAll(level);
 
         ActiveDomain restoring = RESTORING_DOMAINS.remove(uuid);
-        if (restoring != null) restoring.restoreAll(level);
+        if (restoring != null)
+            restoring.restoreAll(level);
     }
 
     // Partículas escuras de "energia amaldiçoada repelindo oceano"
@@ -112,8 +120,8 @@ public class DomainTestHandler {
         double y = player.getY() + player.getBbHeight() * 0.5;
         double z = player.getZ();
 
-        level.sendParticles(ParticleTypes.SQUID_INK,    x, y, z, 40, 1.5, 1.5, 1.5, 0.1);
-        level.sendParticles(ParticleTypes.LARGE_SMOKE,  x, y, z, 20, 2.0, 1.0, 2.0, 0.05);
+        level.sendParticles(ParticleTypes.SQUID_INK, x, y, z, 40, 1.5, 1.5, 1.5, 0.1);
+        level.sendParticles(ParticleTypes.LARGE_SMOKE, x, y, z, 20, 2.0, 1.0, 2.0, 0.05);
         level.sendParticles(ParticleTypes.BUBBLE_COLUMN_UP, x, y, z, 30, 1.0, 0.5, 1.0, 0.2);
     }
 
@@ -141,10 +149,12 @@ public class DomainTestHandler {
         }
 
         private void tickExpand(ServerLevel level) {
-            if (currentRadius < RADIUS) currentRadius += EXPAND_SPEED;
+            if (currentRadius < RADIUS)
+                currentRadius += EXPAND_SPEED;
 
             int intRadius = (int) currentRadius;
-            if (intRadius == lastTickedRadius) return;
+            if (intRadius == lastTickedRadius)
+                return;
             lastTickedRadius = intRadius;
 
             createDome(level);
@@ -168,11 +178,14 @@ public class DomainTestHandler {
                     for (int z = -r; z <= r; z++) {
                         int zz = SQUARES[Math.abs(z)];
 
-                        if (xx + zz > revealRadiusSq) continue;
+                        if (xx + zz > revealRadiusSq)
+                            continue;
 
                         double sphereDistSq = xx + yy + zz;
-                        if (sphereDistSq < innerSq) continue;
-                        if (sphereDistSq > outerSq) continue;
+                        if (sphereDistSq < innerSq)
+                            continue;
+                        if (sphereDistSq > outerSq)
+                            continue;
 
                         mutable.set(center.getX() + x, center.getY() + y, center.getZ() + z);
                         setBlock(level, mutable, getPrettyDomeBlock(x, y, z), 18);
@@ -184,11 +197,15 @@ public class DomainTestHandler {
         private BlockState getPrettyDomeBlock(int x, int y, int z) {
             int pattern = Math.abs((x * 31) + (y * 17) + (z * 13)) % 100;
 
-            if (pattern < 9)  return BS_CRYING_OBSIDIAN;
-            if (pattern < 20) return BS_BLACKSTONE;
+            if (pattern < 9)
+                return BS_CRYING_OBSIDIAN;
+            if (pattern < 20)
+                return BS_BLACKSTONE;
 
-            if (y <= 2 && pattern < 42)          return BS_POLISHED_BLACKSTONE;
-            if (y >= HEIGHT - 3 && pattern < 28) return BS_CRYING_OBSIDIAN;
+            if (y <= 2 && pattern < 42)
+                return BS_POLISHED_BLACKSTONE;
+            if (y >= HEIGHT - 3 && pattern < 28)
+                return BS_CRYING_OBSIDIAN;
 
             if ((Math.abs(x) % 7 == 0 || Math.abs(z) % 7 == 0) && pattern < 35)
                 return BS_BLACKSTONE;
@@ -205,7 +222,8 @@ public class DomainTestHandler {
             for (int x = -r; x <= r; x++) {
                 int xx = SQUARES[Math.abs(x)];
                 for (int z = -r; z <= r; z++) {
-                    if (xx + SQUARES[Math.abs(z)] > revealRadiusSq) continue;
+                    if (xx + SQUARES[Math.abs(z)] > revealRadiusSq)
+                        continue;
                     mutable.set(center.getX() + x, center.getY() - 1, center.getZ() + z);
                     setBlock(level, mutable, getPrettyFloorBlock(x, z), 18);
                 }
@@ -215,9 +233,12 @@ public class DomainTestHandler {
         private BlockState getPrettyFloorBlock(int x, int z) {
             int pattern = Math.abs((x * 19) + (z * 23)) % 100;
 
-            if (pattern < 8)  return BS_CRYING_OBSIDIAN;
-            if (pattern < 35) return BS_POLISHED_BLACKSTONE;
-            if (pattern < 50) return BS_BLACKSTONE;
+            if (pattern < 8)
+                return BS_CRYING_OBSIDIAN;
+            if (pattern < 35)
+                return BS_POLISHED_BLACKSTONE;
+            if (pattern < 50)
+                return BS_BLACKSTONE;
 
             return BS_BLACK_CONCRETE;
         }
@@ -227,7 +248,7 @@ public class DomainTestHandler {
             double revealRadiusSq = Math.min(currentRadius, RADIUS);
             revealRadiusSq *= revealRadiusSq;
 
-            double innerSq    = (RADIUS - DOME_THICKNESS) * (RADIUS - DOME_THICKNESS);
+            double innerSq = (RADIUS - DOME_THICKNESS) * (RADIUS - DOME_THICKNESS);
 
             // FIX: só limpa a "frente" da expansão — evita reprocessar interior já limpo
             // Igual Sukuna avançando: só o anel externo é processado cada tick
@@ -243,25 +264,31 @@ public class DomainTestHandler {
                         int zz = SQUARES[Math.abs(z)];
 
                         double horizDistSq = xx + zz;
-                        if (horizDistSq > revealRadiusSq) continue;
+                        if (horizDistSq > revealRadiusSq)
+                            continue;
 
                         double sphereDistSq = xx + yy + zz;
-                        if (sphereDistSq >= innerSq) continue;
+                        if (sphereDistSq >= innerSq)
+                            continue;
 
                         // FIX: só processa blocos na frente da expansão, não o interior inteiro
-                        if (sphereDistSq < frontMinSq) continue;
+                        if (sphereDistSq < frontMinSq)
+                            continue;
 
                         mutable.set(center.getX() + x, center.getY() + y, center.getZ() + z);
                         BlockState current = level.getBlockState(mutable);
 
-                        // .is() em vez de == porque getBlockState() nem sempre retorna a mesma instância
-                        if (current.is(Blocks.BLACK_CONCRETE)      ||
-                            current.is(Blocks.CRYING_OBSIDIAN)     ||
-                            current.is(Blocks.BLACKSTONE)          ||
-                            current.is(Blocks.POLISHED_BLACKSTONE) ||
-                            current.is(Blocks.AIR)) continue;
+                        // .is() em vez de == porque getBlockState() nem sempre retorna a mesma
+                        // instância
+                        if (current.is(Blocks.BLACK_CONCRETE) ||
+                                current.is(Blocks.CRYING_OBSIDIAN) ||
+                                current.is(Blocks.BLACKSTONE) ||
+                                current.is(Blocks.POLISHED_BLACKSTONE) ||
+                                current.is(Blocks.AIR))
+                            continue;
 
-                        // Fluido: limpa com flag 18 — sem physics cascade, casca já bloqueia entrada de água
+                        // Fluido: limpa com flag 18 — sem physics cascade, casca já bloqueia entrada de
+                        // água
                         if (!current.getFluidState().isEmpty()) {
                             setBlock(level, mutable, BS_AIR, 18);
                             continue;
@@ -280,26 +307,28 @@ public class DomainTestHandler {
 
             BlockState existing = level.getBlockState(immutablePos);
 
-            if (existing.is(Blocks.BEDROCK))       return;
-            if (existing.is(Blocks.BARRIER))       return;
-            if (existing.is(Blocks.COMMAND_BLOCK)) return;
-            if (existing.is(Blocks.NETHER_PORTAL)) return;
-            if (existing.is(Blocks.END_PORTAL))    return;
+            if (existing.is(Blocks.BEDROCK))
+                return;
+            if (existing.is(Blocks.BARRIER))
+                return;
+            if (existing.is(Blocks.COMMAND_BLOCK))
+                return;
+            if (existing.is(Blocks.NETHER_PORTAL))
+                return;
+            if (existing.is(Blocks.END_PORTAL))
+                return;
 
             if (!originalBlocks.containsKey(immutablePos)) {
-                if (level.getBlockEntity(immutablePos) != null) return;
+                if (level.getBlockEntity(immutablePos) != null)
+                    return;
                 originalBlocks.put(immutablePos, existing);
             }
 
             // == seguro aqui porque newState vem sempre dos nossos BS_* cacheados
-            if (existing == newState) return;
+            if (existing == newState)
+                return;
 
             level.setBlock(immutablePos, newState, flags);
-        }
-
-        // Atalho para setTemporaryBlock compatível com código antigo
-        private void setTemporaryBlock(ServerLevel level, BlockPos pos, BlockState newState) {
-            setBlock(level, pos, newState, 2);
         }
 
         private void startRestore() {
@@ -311,7 +340,8 @@ public class DomainTestHandler {
         }
 
         private void tickRestore(ServerLevel level) {
-            if (!restoring) return;
+            if (!restoring)
+                return;
 
             restoreRadius -= RESTORE_SPEED;
             double restoreRadiusSq = restoreRadius * restoreRadius;
@@ -325,7 +355,8 @@ public class DomainTestHandler {
                     BlockState original = originalBlocks.get(pos);
                     if (original != null) {
                         // flag 3 na restauração — reconstrói física e fluidos corretamente
-                        if (level.isLoaded(pos)) level.setBlock(pos, original, 3);
+                        if (level.isLoaded(pos))
+                            level.setBlock(pos, original, 3);
                     }
                     restoreIndex++;
                     processed++;
@@ -340,7 +371,8 @@ public class DomainTestHandler {
             int y = pos.getY() - center.getY();
             int z = pos.getZ() - center.getZ();
 
-            if (y < 0) return x * x + z * z;
+            if (y < 0)
+                return x * x + z * z;
             return x * x + y * y + z * z;
         }
 
@@ -350,7 +382,8 @@ public class DomainTestHandler {
 
         private void restoreAll(ServerLevel level) {
             for (Map.Entry<BlockPos, BlockState> entry : originalBlocks.entrySet()) {
-                if (level.isLoaded(entry.getKey())) level.setBlock(entry.getKey(), entry.getValue(), 3);
+                if (level.isLoaded(entry.getKey()))
+                    level.setBlock(entry.getKey(), entry.getValue(), 3);
             }
 
             originalBlocks.clear();

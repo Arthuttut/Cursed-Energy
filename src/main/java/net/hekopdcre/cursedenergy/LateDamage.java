@@ -17,8 +17,7 @@ import java.util.WeakHashMap;
 
 public class LateDamage {
 
-    private static final Identifier CURSED_ENERGY_POWER =
-            Identifier.parse("ce:cursed_energy_control");
+    private static final Identifier CURSED_ENERGY_POWER = Identifier.parse("ce:cursed_energy_control");
 
     private static final String DIVERGENT_FIST_ABILITY = "divergent_fist";
 
@@ -26,10 +25,10 @@ public class LateDamage {
     private static final float DAMAGE_AMOUNT = 3.0F;
 
     // FIX: DustParticleOptions cacheado — evita criar objeto novo a cada hit
-    private static final DustParticleOptions DIVERGENT_PARTICLE =
-            new DustParticleOptions(0x00CCFF, 1.3F);
+    private static final DustParticleOptions DIVERGENT_PARTICLE = new DustParticleOptions(0x00CCFF, 1.3F);
 
-    // FIX: WeakHashMap — GC limpa entidades mortas/descarregadas automaticamente, sem memory leak
+    // FIX: WeakHashMap — GC limpa entidades mortas/descarregadas automaticamente,
+    // sem memory leak
     private static final Map<LivingEntity, Integer> LATE_DAMAGE = new WeakHashMap<>();
 
     @SubscribeEvent
@@ -37,9 +36,12 @@ public class LateDamage {
         LivingEntity target = event.getEntity();
         Entity attacker = event.getSource().getEntity();
 
-        if (!(attacker instanceof ServerPlayer player)) return;
-        if (!hasCursedEnergyHandEnabled(player)) return;
-        if (target == null || !target.isAlive()) return;
+        if (!(attacker instanceof ServerPlayer player))
+            return;
+        if (!hasCursedEnergyHandEnabled(player))
+            return;
+        if (target == null || !target.isAlive())
+            return;
 
         // putIfAbsent — primeiro hit marca o timer, spam subsequente não reseta
         LATE_DAMAGE.putIfAbsent(target, DELAY_TICKS);
@@ -47,7 +49,8 @@ public class LateDamage {
 
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
-        if (LATE_DAMAGE.isEmpty()) return;
+        if (LATE_DAMAGE.isEmpty())
+            return;
 
         Iterator<Map.Entry<LivingEntity, Integer>> iterator = LATE_DAMAGE.entrySet().iterator();
 
@@ -79,14 +82,13 @@ public class LateDamage {
                         x, y, z,
                         35,
                         0.35, 0.35, 0.35,
-                        0.08
-                );
+                        0.08);
 
                 // FIX: API direta em vez de comando — sem parser, sem string, sem UUID lookup
-                entity.hurt(
+                entity.hurtServer(
+                        level,
                         level.damageSources().magic(),
-                        DAMAGE_AMOUNT
-                );
+                        DAMAGE_AMOUNT);
             }
 
             iterator.remove();
@@ -97,7 +99,6 @@ public class LateDamage {
         return AbilityUtil.isEnabled(
                 player,
                 CURSED_ENERGY_POWER,
-                DIVERGENT_FIST_ABILITY
-        );
+                DIVERGENT_FIST_ABILITY);
     }
 }
