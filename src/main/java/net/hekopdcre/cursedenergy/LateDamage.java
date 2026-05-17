@@ -1,9 +1,7 @@
 package net.hekopdcre.cursedenergy;
 
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -13,10 +11,9 @@ import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.threetag.palladium.power.ability.AbilityUtil;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.UUID;
+import java.util.WeakHashMap;
 
 public class LateDamage {
 
@@ -26,38 +23,44 @@ public class LateDamage {
     private static final String DIVERGENT_FIST_ABILITY = "divergent_fist";
 
     private static final int DELAY_TICKS = 20;
-    private static final int DAMAGE_AMOUNT = 3;
+    private static final float DAMAGE_AMOUNT = 3.0F;
 
-    private static final int PARTICLE_COLOR = 0x00CCFF;
+    // FIX: DustParticleOptions cacheado — evita criar objeto novo a cada hit
+    private static final DustParticleOptions DIVERGENT_PARTICLE =
+            new DustParticleOptions(0x00CCFF, 1.3F);
 
-    private static final Map<UUID, Integer> LATE_DAMAGE_ENTITIES = new HashMap<>();
+    // FIX: WeakHashMap — GC limpa entidades mortas/descarregadas automaticamente, sem memory leak
+    private static final Map<LivingEntity, Integer> LATE_DAMAGE = new WeakHashMap<>();
 
     @SubscribeEvent
     public static void onEntityDamage(LivingDamageEvent.Post event) {
         LivingEntity target = event.getEntity();
         Entity attacker = event.getSource().getEntity();
 
-        if (!(attacker instanceof ServerPlayer player)) {
-            return;
-        }
+        if (!(attacker instanceof ServerPlayer player)) return;
+        if (!hasCursedEnergyHandEnabled(player)) return;
+        if (target == null || !target.isAlive()) return;
 
-        if (!hasCursedEnergyHandEnabled(player)) {
-            return;
-        }
-
-        applyLateDamage(target);
+        // putIfAbsent — primeiro hit marca o timer, spam subsequente não reseta
+        LATE_DAMAGE.putIfAbsent(target, DELAY_TICKS);
     }
 
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
-        MinecraftServer server = event.getServer();
+        if (LATE_DAMAGE.isEmpty()) return;
 
-        Iterator<Map.Entry<UUID, Integer>> iterator = LATE_DAMAGE_ENTITIES.entrySet().iterator();
+        Iterator<Map.Entry<LivingEntity, Integer>> iterator = LATE_DAMAGE.entrySet().iterator();
 
         while (iterator.hasNext()) {
-            Map.Entry<UUID, Integer> entry = iterator.next();
+            Map.Entry<LivingEntity, Integer> entry = iterator.next();
+            LivingEntity entity = entry.getKey();
 
-            UUID entityUuid = entry.getKey();
+            // Entidade morreu antes do timer — limpa sem dar dano
+            if (!entity.isAlive()) {
+                iterator.remove();
+                continue;
+            }
+
             int timer = entry.getValue() - 1;
 
             if (timer > 0) {
@@ -65,10 +68,25 @@ public class LateDamage {
                 continue;
             }
 
-            LivingEntity entity = findLivingEntity(server, entityUuid);
+            // Timer zerou — aplica dano e partículas
+            if (entity.level() instanceof ServerLevel level) {
+                double x = entity.getX();
+                double y = entity.getY() + entity.getBbHeight() * 0.5;
+                double z = entity.getZ();
 
-            if (entity != null && entity.isAlive()) {
-                processLateDamage(server, entity);
+                level.sendParticles(
+                        DIVERGENT_PARTICLE,
+                        x, y, z,
+                        35,
+                        0.35, 0.35, 0.35,
+                        0.08
+                );
+
+                // FIX: API direta em vez de comando — sem parser, sem string, sem UUID lookup
+                entity.hurt(
+                        level.damageSources().magic(),
+                        DAMAGE_AMOUNT
+                );
             }
 
             iterator.remove();
@@ -81,59 +99,5 @@ public class LateDamage {
                 CURSED_ENERGY_POWER,
                 DIVERGENT_FIST_ABILITY
         );
-    }
-
-    private static void applyLateDamage(LivingEntity entity) {
-        if (entity == null || !entity.isAlive()) {
-            return;
-        }
-
-        LATE_DAMAGE_ENTITIES.put(entity.getUUID(), DELAY_TICKS);
-    }
-
-    private static LivingEntity findLivingEntity(MinecraftServer server, UUID uuid) {
-        for (ServerLevel level : server.getAllLevels()) {
-            Entity entity = level.getEntity(uuid);
-
-            if (entity instanceof LivingEntity livingEntity) {
-                return livingEntity;
-            }
-        }
-
-        return null;
-    }
-
-    private static void processLateDamage(MinecraftServer server, LivingEntity entity) {
-        if (!(entity.level() instanceof ServerLevel level)) {
-            return;
-        }
-
-        double x = entity.getX();
-        double y = entity.getY() + entity.getBbHeight() * 0.5D;
-        double z = entity.getZ();
-
-        level.sendParticles(
-                new DustParticleOptions(PARTICLE_COLOR, 1.3F),
-                x,
-                y,
-                z,
-                35,
-                0.35D,
-                0.35D,
-                0.35D,
-                0.08D
-        );
-
-        runServerCommand(
-                server,
-                "damage " + entity.getUUID() + " " + DAMAGE_AMOUNT + " minecraft:magic"
-        );
-    }
-
-    private static void runServerCommand(MinecraftServer server, String command) {
-        CommandSourceStack source = server.createCommandSourceStack()
-                .withSuppressedOutput();
-
-        server.getCommands().performPrefixedCommand(source, command);
     }
 }

@@ -2,7 +2,8 @@
     "type": "minecraft:item",
     "properties": {
         "components": {
-            "minecraft:rarity": "epic"
+            "minecraft:rarity": "epic",
+            "max_stack_size": 1
         }
     }
 }

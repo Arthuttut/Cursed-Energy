@@ -22,7 +22,7 @@
             "type": "palladium:dummy",
             "properties": {
                 "title": "Expansion",
-                "icon": "ce:textures/icon/techniques/divine_dogs2.png",
+                "icon": "ce:textures/icon/misc/shrine.png",
                 "color": "black",
                 "list_index": 4
             },

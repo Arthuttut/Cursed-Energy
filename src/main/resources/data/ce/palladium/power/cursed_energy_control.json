@@ -10,14 +10,14 @@
       "properties": {
         "hidden_in_gui": true
       },
-      "commands": "execute as @s unless score @s sukuna_fingers matches 1..20 run title @s actionbar [{\"text\":\" \",\"color\":\"aqua\"},{\"score\":{\"name\":\"@s\",\"objective\":\"cursed_energy\"},\"color\":\"aqua\"},{\"text\":\" / 1300\",\"color\":\"aqua\"}]"
+      "commands": "execute as @s run title @s actionbar [{\"text\":\" \",\"color\":\"aqua\"},{\"score\":{\"name\":\"@s\",\"objective\":\"cursed_energy\"},\"color\":\"aqua\"},{\"text\":\" / \",\"color\":\"aqua\"},{\"score\":{\"name\":\"@s\",\"objective\":\"max_cursed_energy\"},\"color\":\"aqua\"}]"
     },
     "cursed_energy_increase": {
       "type": "palladium:command",
       "properties": {
         "hidden_in_gui": true
       },
-      "commands": "execute as @s if score @s cursed_energy matches ..1299 run scoreboard players add @s cursed_energy 1",
+      "commands": "execute as @s if score @s cursed_energy < @s max_cursed_energy run scoreboard players add @s cursed_energy 1",
       "state": {
         "enabling": {
           "type": "palladium:not",
@@ -36,7 +36,7 @@
         "hidden_in_gui": true
       },
       "commands": [
-        "execute as @s[tag=!six_eyes] if score @s cursed_energy matches 1.. run scoreboard players remove @s cursed_energy 2",
+        "execute as @s[tag=!six_eyes] if score @s cursed_energy matches 2.. run scoreboard players remove @s cursed_energy 2",
         "execute as @s[tag=six_eyes] if score @s cursed_energy matches 1.. run scoreboard players remove @s cursed_energy 1"
       ],
       "state": {
