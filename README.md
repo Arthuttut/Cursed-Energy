@@ -37,9 +37,9 @@ A Simple JJK Mod that adds cursed energy and jujutsu techniques to Minecraft.
 
 # Requirements
 
-- NeoForge 26.1.2
-- PalladiumPreview 5.0.0
-- Player Animation Library 1.2.3
+- NeoForge 26.1.2 stable beta, alpha
+- PalladiumPreview 5.0.0, latest version
+- Player Animation Library 1.2.3 or above
 
 ---
 
@@ -52,5 +52,5 @@ A Simple JJK Mod that adds cursed energy and jujutsu techniques to Minecraft.
 ---
 
 # Developer
-Made by Heko / Arthur, <br>
+Made by heko / Arthur, <br>
 obs: to change or add a technique for player use: `palladium superpower add ce:technique that you want`
