@@ -3,5 +3,15 @@
     "sounds": [
       "ce:swap"
     ]
+  },
+  "pop": {
+    "sounds": [
+      "ce:pop"
+    ]
+  },
+  "anvil": {
+    "sounds": [
+      "ce:anvil"
+    ]
   }
 }

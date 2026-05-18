@@ -1,67 +1,148 @@
 package net.hekopdcre.cursedenergy.event;
 
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageTypes;
-
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-
+import net.neoforged.neoforge.event.entity.living.LivingKnockBackEvent;
+import net.neoforged.neoforge.event.level.ExplosionEvent;
 import net.threetag.palladium.power.PowerUtil;
+
+import java.util.Random;
 
 @EventBusSubscriber(modid = "ce")
 public class ComedianExplosionHandler {
 
-    private static final Identifier COMEDIAN =
-            Identifier.parse("ce:comedian");
+        private static final Identifier COMEDIAN = Identifier.parse("ce:comedian");
 
-    @SubscribeEvent
-    public static void onDamage(LivingIncomingDamageEvent event) {
+        private static final Random RANDOM = new Random();
 
-        // Verifica jogador
-        if (!(event.getEntity() instanceof ServerPlayer player)) {
-            return;
+        private static final int[] CONFETTI_COLORS = {
+                        0xFFFF3333,
+                        0xFF33FF33,
+                        0xFF3333FF,
+                        0xFFFFFF33,
+                        0xFFFF33FF,
+                        0xFF33FFFF,
+                        0xFFFF9922
+        };
+
+        // CANCELA DANO DE EXPLOSÃO
+        @SubscribeEvent(priority = EventPriority.HIGHEST)
+        public static void onDamage(LivingIncomingDamageEvent event) {
+                if (!(event.getEntity() instanceof ServerPlayer player))
+                        return;
+
+                boolean explosion = event.getSource().is(DamageTypes.EXPLOSION)
+                                || event.getSource().is(DamageTypes.PLAYER_EXPLOSION);
+
+                if (!explosion)
+                        return;
+                if (!PowerUtil.hasPower(player, COMEDIAN))
+                        return;
+
+                event.setCanceled(true);
         }
 
-        // Detecta dano de explosão
-        boolean explosion =
-                event.getSource().is(DamageTypes.EXPLOSION)
-             || event.getSource().is(DamageTypes.PLAYER_EXPLOSION);
+        // CONTROLE PRINCIPAL DA EXPLOSÃO
+        @SubscribeEvent(priority = EventPriority.HIGHEST)
+        public static void onExplosionStart(ExplosionEvent.Start event) {
+                if (!(event.getExplosion().getDirectSourceEntity() instanceof Creeper))
+                        return;
+                if (!(event.getLevel() instanceof ServerLevel level))
+                        return;
 
-        if (!explosion) {
-            return;
+                Vec3 center = event.getExplosion().center();
+
+                boolean hasComedian = level.players().stream()
+                                .filter(p -> p instanceof ServerPlayer sp)
+                                .anyMatch(p -> PowerUtil.hasPower(p, COMEDIAN) &&
+                                                p.distanceToSqr(center.x, center.y, center.z) < 100);
+
+                if (!hasComedian)
+                        return;
+
+                // cancela explosão ANTES dela acontecer (mata som original também)
+                event.setCanceled(true);
+
+                // efeito de confete + som substituto
+                spawnConfetti(level, center);
         }
 
-        // Verifica poder comedian
-        if (!PowerUtil.hasPower(player, COMEDIAN)) {
-            return;
+        // CONFETE + SOM DE FOGOS
+        private static void spawnConfetti(ServerLevel level, Vec3 pos) {
+
+                for (int i = 0; i < 120; i++) {
+                        int color = CONFETTI_COLORS[RANDOM.nextInt(CONFETTI_COLORS.length)];
+                        DustParticleOptions dust = new DustParticleOptions(color, 1.2f);
+
+                        level.sendParticles(
+                                        dust,
+                                        pos.x + (RANDOM.nextDouble() - 0.5),
+                                        pos.y + RANDOM.nextDouble(),
+                                        pos.z + (RANDOM.nextDouble() - 0.5),
+                                        1,
+                                        0,
+                                        0.25,
+                                        0,
+                                        0.05);
+                }
+
+                // som principal (explosão de firework)
+                level.playSound(
+                                null,
+                                pos.x, pos.y, pos.z,
+                                SoundEvents.FIREWORK_ROCKET_BLAST,
+                                SoundSource.PLAYERS,
+                                3.0f,
+                                1.8f);
+
+                // estalo final
+                level.playSound(
+                                null,
+                                pos.x, pos.y, pos.z,
+                                SoundEvents.FIREWORK_ROCKET_TWINKLE,
+                                SoundSource.PLAYERS,
+                                2.5f,
+                                1.6f);
         }
 
-        // Cancela dano
-        event.setCanceled(true);
+        // REMOVE QUALQUER DANO DE BLOCO (FALLBACK)
+        @SubscribeEvent(priority = EventPriority.HIGHEST)
+        public static void onExplosionDetonate(ExplosionEvent.Detonate event) {
+                if (!(event.getLevel() instanceof ServerLevel level))
+                        return;
 
-        // Segurança
-        if (player.level().getServer() == null) {
-            return;
+                Vec3 center = event.getExplosion().center();
+
+                boolean hasComedian = level.players().stream()
+                                .filter(p -> p instanceof ServerPlayer sp)
+                                .anyMatch(p -> PowerUtil.hasPower(p, COMEDIAN) &&
+                                                p.distanceToSqr(center.x, center.y, center.z) < 100);
+
+                if (!hasComedian)
+                        return;
+
+                event.getAffectedBlocks().clear();
         }
 
-        // Para o som da explosão
-        player.level().getServer().getCommands().performPrefixedCommand(
-                player.createCommandSourceStack().withSuppressedOutput(),
-                "stopsound @s * minecraft:entity.generic.explode"
-        );
+        // SEM KNOCKBACK
+        @SubscribeEvent(priority = EventPriority.HIGHEST)
+        public static void onKnockback(LivingKnockBackEvent event) {
+                if (!(event.getEntity() instanceof ServerPlayer player))
+                        return;
+                if (!PowerUtil.hasPower(player, COMEDIAN))
+                        return;
 
-        // Som cartoon/feliz
-        player.level().getServer().getCommands().performPrefixedCommand(
-                player.createCommandSourceStack().withSuppressedOutput(),
-                "playsound minecraft:entity.firework_rocket.twinkle player @s ~ ~ ~ 3 1.7"
-        );
-
-        // Executa confetti
-        player.level().getServer().getCommands().performPrefixedCommand(
-                player.createCommandSourceStack().withSuppressedOutput(),
-                "function ce:confetti"
-        );
-    }
+                event.setStrength(0.0F);
+        }
 }

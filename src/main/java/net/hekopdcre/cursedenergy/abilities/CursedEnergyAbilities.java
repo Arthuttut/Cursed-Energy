@@ -1,0 +1,20 @@
+package net.hekopdcre.cursedenergy.abilities;
+
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.threetag.palladium.power.ability.AbilitySerializer;
+import net.threetag.palladium.registry.PalladiumRegistries;
+
+public class CursedEnergyAbilities {
+
+    public static final DeferredRegister<AbilitySerializer<?>> ABILITIES = DeferredRegister
+            .create(PalladiumRegistries.ABILITY_SERIALIZER, "ce");
+
+    public static final DeferredHolder<AbilitySerializer<?>, DomainExpansionSerializer> DOMAIN_EXPANSION = ABILITIES
+            .register("domain_expansion", DomainExpansionSerializer::new);
+
+    public static void register(IEventBus modEventBus) {
+        ABILITIES.register(modEventBus);
+    }
+}
