@@ -64,7 +64,7 @@ public class ComedianExplosionHandler {
                 Vec3 center = event.getExplosion().center();
 
                 boolean hasComedian = level.players().stream()
-                                .filter(p -> p instanceof ServerPlayer sp)
+                                .filter(p -> p instanceof ServerPlayer)
                                 .anyMatch(p -> PowerUtil.hasPower(p, COMEDIAN) &&
                                                 p.distanceToSqr(center.x, center.y, center.z) < 100);
 
@@ -125,7 +125,7 @@ public class ComedianExplosionHandler {
                 Vec3 center = event.getExplosion().center();
 
                 boolean hasComedian = level.players().stream()
-                                .filter(p -> p instanceof ServerPlayer sp)
+                                .filter(p -> p instanceof ServerPlayer)
                                 .anyMatch(p -> PowerUtil.hasPower(p, COMEDIAN) &&
                                                 p.distanceToSqr(center.x, center.y, center.z) < 100);
 

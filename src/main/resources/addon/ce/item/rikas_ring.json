@@ -3,7 +3,10 @@
     "properties": {
         "components": {
             "minecraft:rarity": "epic",
-            "max_stack_size": 1
+            "max_stack_size": 1,
+            "minecraft:damage_resistant": {
+                "types": "#minecraft:is_fire"
+            }
         }
     }
 }

@@ -1,35 +1,27 @@
 package net.hekopdcre.cursedenergy;
 
+import net.hekopdcre.cursedenergy.abilities.CursedEnergyAbilities;
+import net.hekopdcre.cursedenergy.abilities.DivergentFistAbility;
 import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.threetag.palladium.power.ability.AbilityInstance;
 import net.threetag.palladium.power.ability.AbilityUtil;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+@EventBusSubscriber(modid = "ce")
 public class LateDamage {
 
-    private static final Identifier CURSED_ENERGY_POWER = Identifier.parse("ce:cursed_energy_control");
-
-    private static final String DIVERGENT_FIST_ABILITY = "divergent_fist";
-
-    private static final int DELAY_TICKS = 20;
-    private static final float DAMAGE_AMOUNT = 3.0F;
-
-    // FIX: DustParticleOptions cacheado — evita criar objeto novo a cada hit
-    private static final DustParticleOptions DIVERGENT_PARTICLE = new DustParticleOptions(0x00CCFF, 1.3F);
-
-    // FIX: WeakHashMap — GC limpa entidades mortas/descarregadas automaticamente,
-    // sem memory leak
-    private static final Map<LivingEntity, Integer> LATE_DAMAGE = new WeakHashMap<>();
+    private static final Map<LivingEntity, LateDamageData> LATE_DAMAGE = new WeakHashMap<>();
 
     @SubscribeEvent
     public static void onEntityDamage(LivingDamageEvent.Post event) {
@@ -38,13 +30,35 @@ public class LateDamage {
 
         if (!(attacker instanceof ServerPlayer player))
             return;
-        if (!hasCursedEnergyHandEnabled(player))
-            return;
         if (target == null || !target.isAlive())
             return;
 
-        // putIfAbsent — primeiro hit marca o timer, spam subsequente não reseta
-        LATE_DAMAGE.putIfAbsent(target, DELAY_TICKS);
+        AbilityInstance<DivergentFistAbility> instance = AbilityUtil.getEnabledInstances(
+                player,
+                CursedEnergyAbilities.DIVERGENT_FIST.get()).stream().findFirst().orElse(null);
+
+        if (instance == null)
+            return;
+
+        DivergentFistAbility ability = instance.getAbility();
+        if (ability == null)
+            return;
+
+        // Aplica o dano inicial imediatamente
+        if (ability.initialDamage > 0 && target.level() instanceof ServerLevel level) {
+            target.hurtServer(
+                    level,
+                    level.damageSources().magic(),
+                    (float) ability.initialDamage);
+        }
+
+        // Registra o dano atrasado (não reseta se já estiver marcado)
+        LATE_DAMAGE.putIfAbsent(
+                target,
+                new LateDamageData(
+                        ability.delayTicks,
+                        ability.extraDamage,
+                        ability.particleColor));
     }
 
     @SubscribeEvent
@@ -52,53 +66,52 @@ public class LateDamage {
         if (LATE_DAMAGE.isEmpty())
             return;
 
-        Iterator<Map.Entry<LivingEntity, Integer>> iterator = LATE_DAMAGE.entrySet().iterator();
+        Iterator<Map.Entry<LivingEntity, LateDamageData>> iterator = LATE_DAMAGE.entrySet().iterator();
 
         while (iterator.hasNext()) {
-            Map.Entry<LivingEntity, Integer> entry = iterator.next();
+            Map.Entry<LivingEntity, LateDamageData> entry = iterator.next();
             LivingEntity entity = entry.getKey();
+            LateDamageData data = entry.getValue();
 
-            // Entidade morreu antes do timer — limpa sem dar dano
-            if (!entity.isAlive()) {
+            if (entity == null || !entity.isAlive()) {
                 iterator.remove();
                 continue;
             }
 
-            int timer = entry.getValue() - 1;
-
-            if (timer > 0) {
-                entry.setValue(timer);
+            data.timer--;
+            if (data.timer > 0)
                 continue;
-            }
 
-            // Timer zerou — aplica dano e partículas
             if (entity.level() instanceof ServerLevel level) {
-                double x = entity.getX();
-                double y = entity.getY() + entity.getBbHeight() * 0.5;
-                double z = entity.getZ();
-
                 level.sendParticles(
-                        DIVERGENT_PARTICLE,
-                        x, y, z,
+                        data.particle,
+                        entity.getX(),
+                        entity.getY() + entity.getBbHeight() * 0.5,
+                        entity.getZ(),
                         35,
-                        0.35, 0.35, 0.35,
+                        0.35,
+                        0.35,
+                        0.35,
                         0.08);
-
-                // FIX: API direta em vez de comando — sem parser, sem string, sem UUID lookup
                 entity.hurtServer(
                         level,
                         level.damageSources().magic(),
-                        DAMAGE_AMOUNT);
+                        (float) data.damage);
             }
 
             iterator.remove();
         }
     }
 
-    private static boolean hasCursedEnergyHandEnabled(ServerPlayer player) {
-        return AbilityUtil.isEnabled(
-                player,
-                CURSED_ENERGY_POWER,
-                DIVERGENT_FIST_ABILITY);
+    private static class LateDamageData {
+        int timer;
+        final double damage;
+        final DustParticleOptions particle;
+
+        LateDamageData(int timer, double damage, int color) {
+            this.timer = timer;
+            this.damage = damage;
+            this.particle = new DustParticleOptions(color, 1.3F);
+        }
     }
 }

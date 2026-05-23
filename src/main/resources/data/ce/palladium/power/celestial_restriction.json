@@ -36,6 +36,21 @@
                     }
                 }
             }
+        },
+        "sprint": {
+            "type": "palladium:attribute_modifier",
+            "modifier": {
+                "attribute": "minecraft:movement_speed",
+                "amount": {
+                    "type": "palladium:convert_to_float",
+                    "value": {
+                        "type": "palladium:score",
+                        "objective": "sprint"
+                    },
+                    "modify": "this * 0.001"
+                },
+                "operation": "add_value"
+            }
         }
     }
 }

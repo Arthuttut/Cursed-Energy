@@ -9,7 +9,7 @@
                 "title": "Don't Move",
                 "icon": {
                     "type": "palladium:texture",
-                    "texture": "ce:textures/icon/techniques/dont_move.png"
+                    "texture": "ce:textures/icon/misc/cant_walk.png"
                 },
                 "color": "cyan",
                 "list_index": 0

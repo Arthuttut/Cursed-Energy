@@ -1,9 +1,7 @@
 {
   "name": "Cursed Energy Control",
   "icon": "ce:textures/icon/misc/cursed_energy.png",
-  "animation_controller": {
-    "movement": "ce:run"
-  },
+  "ability_bar_texture": "ce:textures/gui/ability_bars/cursed_energy_control.png",
   "abilities": {
     "cursed_energy": {
       "type": "palladium:command",
@@ -47,7 +45,7 @@
       }
     },
     "divergent_fist": {
-      "type": "palladium:attribute_modifier",
+      "type": "ce:divergent_fist",
       "properties": {
         "title": "Divergent Fist",
         "icon": {
@@ -57,11 +55,10 @@
         "color": "cyan",
         "list_index": 0
       },
-      "modifier": {
-        "attribute": "minecraft:attack_damage",
-        "amount": 3,
-        "operation": "add_value"
-      },
+      "delay_ticks": 20,
+      "initial_damage": 6,
+      "extra_damage": 3,
+      "particle_color": 52479,
       "state": {
         "unlocking": [
           {
