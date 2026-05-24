@@ -1,0 +1,37 @@
+{
+    "name": "Copy",
+    "icon": "ce:textures/icon/techniques/comedian.png",
+    "parent": "ce:cursed_energy_control",
+    "abilities": {
+        "effect_clear": {
+            "type": "palladium:command",
+            "commands": "effect clear @s"
+        },
+        "expansion_test": {
+            "type": "ce:domain_expansion",
+            "properties": {
+                "title": "Expansion Test"
+            },
+            "radius": 15,
+            "height": 15,
+            "expand_speed": 0.75,
+            "restore_speed": 0.85,
+            "dome_thickness": 1.65,
+            "restore_batch_size": 200,
+            "spawn_particles_on_water": true,
+            "dome_main_block": "minecraft:black_concrete",
+            "dome_accent_block_1": "minecraft:crying_obsidian",
+            "dome_accent_block_2": "minecraft:blackstone",
+            "dome_base_accent_block": "minecraft:black_concrete",
+            "floor_main_block": "minecraft:black_concrete",
+            "floor_accent_block_1": "minecraft:crying_obsidian",
+            "floor_accent_block_2": "minecraft:black_concrete",
+            "state": {
+                "enabling": {
+                    "type": "palladium:key_bind",
+                    "behaviour": "toggle"
+                }
+            }
+        }
+    }
+}

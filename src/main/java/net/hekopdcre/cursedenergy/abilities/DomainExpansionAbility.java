@@ -99,19 +99,39 @@ public class DomainExpansionAbility extends Ability {
     public final boolean spawnParticlesOnWater;
     public final BlockConfig blockConfig;
 
-    public String domeMainBlock()       { return blockConfig.domeMain(); }
-    public String domeAccentBlock1()    { return blockConfig.domeAccent1(); }
-    public String domeAccentBlock2()    { return blockConfig.domeAccent2(); }
-    public String domeBaseAccentBlock() { return blockConfig.domeBaseAccent(); }
-    public String floorMainBlock()      { return blockConfig.floorMain(); }
-    public String floorAccentBlock1()   { return blockConfig.floorAccent1(); }
-    public String floorAccentBlock2()   { return blockConfig.floorAccent2(); }
+    public String domeMainBlock() {
+        return blockConfig.domeMain();
+    }
+
+    public String domeAccentBlock1() {
+        return blockConfig.domeAccent1();
+    }
+
+    public String domeAccentBlock2() {
+        return blockConfig.domeAccent2();
+    }
+
+    public String domeBaseAccentBlock() {
+        return blockConfig.domeBaseAccent();
+    }
+
+    public String floorMainBlock() {
+        return blockConfig.floorMain();
+    }
+
+    public String floorAccentBlock1() {
+        return blockConfig.floorAccent1();
+    }
+
+    public String floorAccentBlock2() {
+        return blockConfig.floorAccent2();
+    }
 
     // =========================================================================
     // Domain maps — separados por dimensão
     // =========================================================================
 
-    private static final Map<ResourceKey<Level>, Map<UUID, ActiveDomain>> ACTIVE_DOMAINS    = new HashMap<>();
+    private static final Map<ResourceKey<Level>, Map<UUID, ActiveDomain>> ACTIVE_DOMAINS = new HashMap<>();
     private static final Map<ResourceKey<Level>, Map<UUID, ActiveDomain>> RESTORING_DOMAINS = new HashMap<>();
 
     private static Map<UUID, ActiveDomain> activeMap(ResourceKey<Level> dim) {
@@ -130,8 +150,8 @@ public class DomainExpansionAbility extends Ability {
      * Fonte da verdade global para todos os blocos modificados por qualquer domain.
      *
      * Estrutura:
-     *   dim -> (packedPos -> BlockLedger)          — estado original + stack de owners
-     *   dim -> (uuid     -> LongSet de packedPos)  — índice inverso para restore rápido
+     * dim -> (packedPos -> BlockLedger) — estado original + stack de owners
+     * dim -> (uuid -> LongSet de packedPos) — índice inverso para restore rápido
      *
      * Invariante: um bloco só tem `originalState` registrado uma vez, mesmo que N
      * domains o sobrescrevam. O restore do último owner devolve o estado original.
@@ -139,13 +159,11 @@ public class DomainExpansionAbility extends Ability {
     static final class BlockLedgerSystem {
 
         // Estado original + stack de quem modificou, por dimensão e posição
-        private static final Map<ResourceKey<Level>, Long2ObjectOpenHashMap<BlockLedger>>
-                LEDGERS = new HashMap<>();
+        private static final Map<ResourceKey<Level>, Long2ObjectOpenHashMap<BlockLedger>> LEDGERS = new HashMap<>();
 
         // Índice inverso: owner -> set de packed positions que ele owns, por dimensão
         // Permite encontrar todos os blocos de um domain em O(1) sem varrer o ledger.
-        private static final Map<ResourceKey<Level>, Map<UUID, LongSet>>
-                OWNER_INDEX = new HashMap<>();
+        private static final Map<ResourceKey<Level>, Map<UUID, LongSet>> OWNER_INDEX = new HashMap<>();
 
         // -----------------------------------------------------------------------
         // Tipos internos
@@ -161,7 +179,8 @@ public class DomainExpansionAbility extends Ability {
             }
         }
 
-        record OwnershipEntry(UUID owner, BlockState placedState) {}
+        record OwnershipEntry(UUID owner, BlockState placedState) {
+        }
 
         // -----------------------------------------------------------------------
         // Helpers de acesso
@@ -193,8 +212,9 @@ public class DomainExpansionAbility extends Ability {
          * @return true se o bloco foi efetivamente colocado.
          */
         static boolean place(ResourceKey<Level> dim, BlockPos pos, UUID owner,
-                             BlockState newState, ServerLevel level, int flags) {
-            if (!level.isLoaded(pos)) return false;
+                BlockState newState, ServerLevel level, int flags) {
+            if (!level.isLoaded(pos))
+                return false;
 
             BlockState current = level.getBlockState(pos);
 
@@ -210,7 +230,8 @@ public class DomainExpansionAbility extends Ability {
             BlockLedger ledger = lmap.get(packed);
             if (ledger == null) {
                 // Primeira modificação nesta posição: bloco com BlockEntity não entra
-                if (level.getBlockEntity(pos) != null) return false;
+                if (level.getBlockEntity(pos) != null)
+                    return false;
                 ledger = new BlockLedger(current);
                 lmap.put(packed, ledger);
             }
@@ -222,7 +243,8 @@ public class DomainExpansionAbility extends Ability {
             ledger.ownerStack.addLast(new OwnershipEntry(owner, newState));
             ownerSet(dim, owner).add(packed);
 
-            if (newState.equals(current)) return false; // estado igual, não precisa setar
+            if (newState.equals(current))
+                return false; // estado igual, não precisa setar
             level.setBlock(pos, newState, flags);
             return true;
         }
@@ -236,10 +258,12 @@ public class DomainExpansionAbility extends Ability {
          */
         static void release(ResourceKey<Level> dim, long packed, UUID owner, ServerLevel level) {
             Long2ObjectOpenHashMap<BlockLedger> lmap = LEDGERS.get(dim);
-            if (lmap == null) return;
+            if (lmap == null)
+                return;
 
             BlockLedger ledger = lmap.get(packed);
-            if (ledger == null) return;
+            if (ledger == null)
+                return;
 
             // Remove todas as entries do owner na stack deste bloco
             ledger.ownerStack.removeIf(e -> e.owner().equals(owner));
@@ -250,16 +274,19 @@ public class DomainExpansionAbility extends Ability {
                 LongSet ownerPositions = dimIndex.get(owner);
                 if (ownerPositions != null) {
                     ownerPositions.remove(packed);
-                    if (ownerPositions.isEmpty()) dimIndex.remove(owner);
+                    if (ownerPositions.isEmpty())
+                        dimIndex.remove(owner);
                 }
-                if (dimIndex.isEmpty()) OWNER_INDEX.remove(dim);
+                if (dimIndex.isEmpty())
+                    OWNER_INDEX.remove(dim);
             }
 
             BlockPos pos = BlockPos.of(packed);
             if (!level.isLoaded(pos)) {
                 // Chunk não carregado: limpa ledger mesmo assim para não vazar memória.
                 // O bloco não será restaurado — trade-off aceitável.
-                if (ledger.ownerStack.isEmpty()) lmap.remove(packed);
+                if (ledger.ownerStack.isEmpty())
+                    lmap.remove(packed);
                 return;
             }
 
@@ -267,7 +294,8 @@ public class DomainExpansionAbility extends Ability {
                 // Ninguém mais neste bloco — volta ao estado original
                 level.setBlock(pos, ledger.originalState, 3);
                 lmap.remove(packed);
-                if (lmap.isEmpty()) LEDGERS.remove(dim);
+                if (lmap.isEmpty())
+                    LEDGERS.remove(dim);
             } else {
                 // Ainda tem outro domain ativo — aplica o topo da stack
                 BlockState topState = ledger.ownerStack.peekLast().placedState();
@@ -284,7 +312,8 @@ public class DomainExpansionAbility extends Ability {
          */
         static LongSet getOwnedPositions(ResourceKey<Level> dim, UUID owner) {
             Map<UUID, LongSet> dimIndex = OWNER_INDEX.get(dim);
-            if (dimIndex == null) return new LongOpenHashSet();
+            if (dimIndex == null)
+                return new LongOpenHashSet();
             LongSet set = dimIndex.get(owner);
             return set != null ? new LongOpenHashSet(set) : new LongOpenHashSet();
         }
@@ -295,9 +324,11 @@ public class DomainExpansionAbility extends Ability {
          */
         static void clearOwnerIndex(ResourceKey<Level> dim, UUID owner) {
             Map<UUID, LongSet> dimIndex = OWNER_INDEX.get(dim);
-            if (dimIndex == null) return;
+            if (dimIndex == null)
+                return;
             dimIndex.remove(owner);
-            if (dimIndex.isEmpty()) OWNER_INDEX.remove(dim);
+            if (dimIndex.isEmpty())
+                OWNER_INDEX.remove(dim);
         }
 
         /**
@@ -351,8 +382,10 @@ public class DomainExpansionAbility extends Ability {
 
     @Override
     public boolean tick(LivingEntity entity, AbilityInstance<?> instance, boolean enabled) {
-        if (!(entity instanceof ServerPlayer player)) return false;
-        if (!(player.level() instanceof ServerLevel level)) return false;
+        if (!(entity instanceof ServerPlayer player))
+            return false;
+        if (!(player.level() instanceof ServerLevel level))
+            return false;
 
         UUID uuid = player.getUUID();
         ResourceKey<Level> dim = level.dimension();
@@ -360,7 +393,8 @@ public class DomainExpansionAbility extends Ability {
         if (enabled) {
             // Se estava em restore, cancela e força restore imediato antes de reexpandir
             ActiveDomain restoring = restoringMap(dim).remove(uuid);
-            if (restoring != null) restoring.forceRestoreAll(dim, level);
+            if (restoring != null)
+                restoring.forceRestoreAll(dim, level);
 
             Map<UUID, ActiveDomain> active = activeMap(dim);
             ActiveDomain domain = active.get(uuid);
@@ -395,8 +429,10 @@ public class DomainExpansionAbility extends Ability {
 
     @Override
     public void lastTick(LivingEntity entity, AbilityInstance<?> instance) {
-        if (!(entity instanceof ServerPlayer player)) return;
-        if (!(player.level() instanceof ServerLevel level)) return;
+        if (!(entity instanceof ServerPlayer player))
+            return;
+        if (!(player.level() instanceof ServerLevel level))
+            return;
 
         UUID uuid = player.getUUID();
         ResourceKey<Level> dim = level.dimension();
@@ -428,7 +464,8 @@ public class DomainExpansionAbility extends Ability {
             }
         }
 
-        if (map.isEmpty()) RESTORING_DOMAINS.remove(dim);
+        if (map.isEmpty())
+            RESTORING_DOMAINS.remove(dim);
     }
 
     /**
@@ -440,17 +477,19 @@ public class DomainExpansionAbility extends Ability {
             ResourceKey<Level> dim = level.dimension();
 
             ActiveDomain active = activeMap(dim).remove(uuid);
-            if (active != null) active.forceRestoreAll(dim, level);
+            if (active != null)
+                active.forceRestoreAll(dim, level);
 
             ActiveDomain restoring = restoringMap(dim).remove(uuid);
-            if (restoring != null) restoring.forceRestoreAll(dim, level);
+            if (restoring != null)
+                restoring.forceRestoreAll(dim, level);
         }
     }
 
     private static void spawnActivationParticles(ServerLevel level, ServerPlayer player) {
         double x = player.getX(), y = player.getY() + player.getBbHeight() * 0.5, z = player.getZ();
-        level.sendParticles(ParticleTypes.SQUID_INK,        x, y, z, 40, 1.5, 1.5, 1.5, 0.1);
-        level.sendParticles(ParticleTypes.LARGE_SMOKE,      x, y, z, 20, 2.0, 1.0, 2.0, 0.05);
+        level.sendParticles(ParticleTypes.SQUID_INK, x, y, z, 40, 1.5, 1.5, 1.5, 0.1);
+        level.sendParticles(ParticleTypes.LARGE_SMOKE, x, y, z, 20, 2.0, 1.0, 2.0, 0.05);
         level.sendParticles(ParticleTypes.BUBBLE_COLUMN_UP, x, y, z, 30, 1.0, 0.5, 1.0, 0.2);
     }
 
@@ -460,7 +499,8 @@ public class DomainExpansionAbility extends Ability {
 
     static class ActiveDomain {
 
-        record Offset(int x, int y, int z) {}
+        record Offset(int x, int y, int z) {
+        }
 
         private final BlockPos center;
         private final DomainExpansionAbility cfg;
@@ -492,35 +532,35 @@ public class DomainExpansionAbility extends Ability {
 
         ActiveDomain(BlockPos center, DomainExpansionAbility cfg, UUID owner, ResourceKey<Level> dim) {
             this.center = center.immutable();
-            this.cfg    = cfg;
-            this.owner  = owner;
-            this.dim    = dim;
+            this.cfg = cfg;
+            this.owner = owner;
+            this.dim = dim;
             this.restoreRadius = cfg.radius + 3;
 
             BlockConfig bc = cfg.blockConfig;
 
-            bsMain         = resolveState(bc.domeMain(),       Blocks.BLACK_CONCRETE);
-            bsAccent1      = resolveState(bc.domeAccent1(),    Blocks.CRYING_OBSIDIAN);
-            bsAccent2      = resolveState(bc.domeAccent2(),    Blocks.BLACKSTONE);
-            bsBaseAccent   = resolveState(bc.domeBaseAccent(), Blocks.POLISHED_BLACKSTONE);
-            bsFloorMain    = resolveState(bc.floorMain(),      Blocks.BLACK_CONCRETE);
-            bsFloorAccent1 = resolveState(bc.floorAccent1(),   Blocks.CRYING_OBSIDIAN);
-            bsFloorAccent2 = resolveState(bc.floorAccent2(),   Blocks.POLISHED_BLACKSTONE);
+            bsMain = resolveState(bc.domeMain(), Blocks.BLACK_CONCRETE);
+            bsAccent1 = resolveState(bc.domeAccent1(), Blocks.CRYING_OBSIDIAN);
+            bsAccent2 = resolveState(bc.domeAccent2(), Blocks.BLACKSTONE);
+            bsBaseAccent = resolveState(bc.domeBaseAccent(), Blocks.POLISHED_BLACKSTONE);
+            bsFloorMain = resolveState(bc.floorMain(), Blocks.BLACK_CONCRETE);
+            bsFloorAccent1 = resolveState(bc.floorAccent1(), Blocks.CRYING_OBSIDIAN);
+            bsFloorAccent2 = resolveState(bc.floorAccent2(), Blocks.POLISHED_BLACKSTONE);
 
-            blMain         = bsMain.getBlock();
-            blAccent1      = bsAccent1.getBlock();
-            blAccent2      = bsAccent2.getBlock();
-            blBaseAccent   = bsBaseAccent.getBlock();
-            blFloorMain    = bsFloorMain.getBlock();
+            blMain = bsMain.getBlock();
+            blAccent1 = bsAccent1.getBlock();
+            blAccent2 = bsAccent2.getBlock();
+            blBaseAccent = bsBaseAccent.getBlock();
+            blFloorMain = bsFloorMain.getBlock();
             blFloorAccent1 = bsFloorAccent1.getBlock();
             blFloorAccent2 = bsFloorAccent2.getBlock();
 
             int r = cfg.radius;
             double innerSq = (r - cfg.domeThickness) * (r - cfg.domeThickness);
             double outerSq = (r + cfg.domeThickness) * (r + cfg.domeThickness);
-            double rSq     = (double) (r * r);
+            double rSq = (double) (r * r);
 
-            domeOffsets  = new ArrayList<>();
+            domeOffsets = new ArrayList<>();
             floorOffsets = new ArrayList<>();
             clearOffsets = new ArrayList<>();
 
@@ -535,7 +575,7 @@ public class DomainExpansionAbility extends Ability {
                     for (int z = -r; z <= r; z++) {
                         int zz = z * z;
                         double dh = xx + zz;
-                        double d  = xx + yy + zz;
+                        double d = xx + yy + zz;
                         if (dh <= rSq && d >= innerSq && d <= outerSq)
                             domeOffsets.add(new Offset(x, y, z));
                         if (Math.abs(x) < r && Math.abs(z) < r && y < cfg.height
@@ -563,9 +603,11 @@ public class DomainExpansionAbility extends Ability {
         // -----------------------------------------------------------------------
 
         void tickExpand(ServerLevel level) {
-            if (currentRadius < cfg.radius) currentRadius += cfg.expandSpeed;
+            if (currentRadius < cfg.radius)
+                currentRadius += cfg.expandSpeed;
             int ir = (int) currentRadius;
-            if (ir == lastTickRadius) return;
+            if (ir == lastTickRadius)
+                return;
             lastTickRadius = ir;
 
             double revSq = Math.min(currentRadius, cfg.radius);
@@ -579,7 +621,8 @@ public class DomainExpansionAbility extends Ability {
         private void placeDome(ServerLevel level, double revSq) {
             BlockPos.MutableBlockPos mut = new BlockPos.MutableBlockPos();
             for (Offset o : domeOffsets) {
-                if ((double) (o.x() * o.x() + o.z() * o.z()) > revSq) continue;
+                if ((double) (o.x() * o.x() + o.z() * o.z()) > revSq)
+                    continue;
                 mut.set(center.getX() + o.x(), center.getY() + o.y(), center.getZ() + o.z());
                 BlockLedgerSystem.place(dim, mut, owner,
                         getDomeBlock(o.x(), o.y(), o.z()), level, 18);
@@ -588,18 +631,24 @@ public class DomainExpansionAbility extends Ability {
 
         private BlockState getDomeBlock(int x, int y, int z) {
             int p = Math.abs((x * 31) + (y * 17) + (z * 13)) % 100;
-            if (p < 9) return bsAccent1;
-            if (p < 20) return bsAccent2;
-            if (y <= 2 && p < 42) return bsBaseAccent;
-            if (y >= cfg.height - 3 && p < 28) return bsAccent1;
-            if ((Math.abs(x) % 7 == 0 || Math.abs(z) % 7 == 0) && p < 35) return bsAccent2;
+            if (p < 9)
+                return bsAccent1;
+            if (p < 20)
+                return bsAccent2;
+            if (y <= 2 && p < 42)
+                return bsBaseAccent;
+            if (y >= cfg.height - 3 && p < 28)
+                return bsAccent1;
+            if ((Math.abs(x) % 7 == 0 || Math.abs(z) % 7 == 0) && p < 35)
+                return bsAccent2;
             return bsMain;
         }
 
         private void placeFloor(ServerLevel level, double revSq) {
             BlockPos.MutableBlockPos mut = new BlockPos.MutableBlockPos();
             for (Offset o : floorOffsets) {
-                if ((double) (o.x() * o.x() + o.z() * o.z()) > revSq) continue;
+                if ((double) (o.x() * o.x() + o.z() * o.z()) > revSq)
+                    continue;
                 mut.set(center.getX() + o.x(), center.getY() + o.y(), center.getZ() + o.z());
                 BlockLedgerSystem.place(dim, mut, owner,
                         getFloorBlock(o.x(), o.z()), level, 18);
@@ -608,9 +657,12 @@ public class DomainExpansionAbility extends Ability {
 
         private BlockState getFloorBlock(int x, int z) {
             int p = Math.abs((x * 19) + (z * 23)) % 100;
-            if (p < 8)  return bsFloorAccent1;
-            if (p < 35) return bsFloorAccent2;
-            if (p < 50) return bsAccent2;
+            if (p < 8)
+                return bsFloorAccent1;
+            if (p < 35)
+                return bsFloorAccent2;
+            if (p < 50)
+                return bsAccent2;
             return bsFloorMain;
         }
 
@@ -621,11 +673,14 @@ public class DomainExpansionAbility extends Ability {
             BlockPos.MutableBlockPos mut = new BlockPos.MutableBlockPos();
             for (Offset o : clearOffsets) {
                 double dh = (double) (o.x() * o.x() + o.z() * o.z());
-                if (dh > revSq) continue;
+                if (dh > revSq)
+                    continue;
                 double d = dh + (double) (o.y() * o.y());
-                if (d < frontMin) continue;
+                if (d < frontMin)
+                    continue;
                 mut.set(center.getX() + o.x(), center.getY() + o.y(), center.getZ() + o.z());
-                if (!level.isLoaded(mut)) continue;
+                if (!level.isLoaded(mut))
+                    continue;
 
                 // Só limpa se não for bloco do próprio domain (qualquer owner)
                 BlockState cur = level.getBlockState(mut);
@@ -650,7 +705,8 @@ public class DomainExpansionAbility extends Ability {
          * Ordena do mais distante para o mais próximo — efeito visual de colapso.
          */
         void startRestore(ResourceKey<Level> dim) {
-            if (restoring) return;
+            if (restoring)
+                return;
             restoring = true;
             restoreRadius = cfg.radius + 3;
 
@@ -658,7 +714,7 @@ public class DomainExpansionAbility extends Ability {
             restoreQueue = new ArrayList<>(owned.size());
             for (long packed : owned) {
                 double dist = distSq(BlockPos.of(packed));
-                restoreQueue.add(new long[]{ packed, Double.doubleToRawLongBits(dist) });
+                restoreQueue.add(new long[] { packed, Double.doubleToRawLongBits(dist) });
             }
             restoreQueue.sort((a, b) -> Double.compare(
                     Double.longBitsToDouble(b[1]),
@@ -667,15 +723,16 @@ public class DomainExpansionAbility extends Ability {
         }
 
         void tickRestore(ResourceKey<Level> dim, ServerLevel level) {
-            if (!restoring) return;
+            if (!restoring)
+                return;
             restoreRadius -= cfg.restoreSpeed;
             double rSq = restoreRadius * restoreRadius;
 
             int processed = 0;
             while (restoreIndex < restoreQueue.size() && processed < cfg.restoreBatchSize) {
-                long[] entry   = restoreQueue.get(restoreIndex);
-                long packed    = entry[0];
-                double dist    = Double.longBitsToDouble(entry[1]);
+                long[] entry = restoreQueue.get(restoreIndex);
+                long packed = entry[0];
+                double dist = Double.longBitsToDouble(entry[1]);
 
                 if (dist >= rSq || restoreRadius <= 0) {
                     BlockLedgerSystem.release(dim, packed, owner, level);

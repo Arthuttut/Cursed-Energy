@@ -1,6 +1,9 @@
 {
     "name": "Celestial Restriction",
     "icon": "ce:textures/icon/misc/no_cursed_energy.png",
+    "animation_controller": {
+        "special": "ce:run"
+    },
     "abilities": {
         "step_height": {
             "type": "palladium:attribute_modifier",

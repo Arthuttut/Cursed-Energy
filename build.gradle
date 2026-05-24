@@ -14,6 +14,7 @@ group = mod_group_id
 
 sourceSets.main.resources {
     srcDir('src/generated/resources')
+
     exclude("**/*.bbmodel")
     exclude("src/generated/**/.cache")
 }
@@ -21,10 +22,12 @@ sourceSets.main.resources {
 repositories {
     mavenLocal()
     mavenCentral()
+
     maven {
         name = "NeoForge"
         url = "https://maven.neoforged.net/releases"
     }
+
     maven {
         name = "GeckoLib"
         url = "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
@@ -47,22 +50,27 @@ neoForge {
     runs {
         client {
             client()
+
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         server {
             server()
+
             programArgument '--nogui'
+
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         gameTestServer {
             type = "gameTestServer"
+
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         data {
             clientData()
+
             programArguments.addAll '--mod', project.mod_id,
                     '--all',
                     '--output', file('src/generated/resources/').getAbsolutePath(),
@@ -71,6 +79,7 @@ neoForge {
 
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'
+
             logLevel = org.slf4j.event.Level.DEBUG
         }
     }
@@ -89,25 +98,32 @@ configurations {
 dependencies {
     implementation files('libs/palladium-5.0.0+26.1.2.jar')
     implementation files('libs/PlayerAnimationLibMerged-1.2.3+mc.26.1.jar')
+    implementation "com.geckolib:geckolib-neoforge-26.1.2:5.5.1"
+    interfaceInjectionData "com.geckolib:geckolib-neoforge-26.1.2:5.5.1"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [
-            minecraft_version      : minecraft_version,
-            minecraft_version_range: minecraft_version_range,
-            neo_version            : neo_version,
-            mod_id                 : mod_id,
-            mod_name               : mod_name,
-            mod_license            : mod_license,
-            mod_version            : mod_version,
+            minecraft_version       : minecraft_version,
+            minecraft_version_range : minecraft_version_range,
+            neo_version             : neo_version,
+            mod_id                  : mod_id,
+            mod_name                : mod_name,
+            mod_license             : mod_license,
+            mod_version             : mod_version,
     ]
+
     inputs.properties replaceProperties
+
     expand replaceProperties
+
     from "src/main/templates"
+
     into "build/generated/sources/modMetadata"
 }
 
 sourceSets.main.resources.srcDir generateModMetadata
+
 neoForge.ideSyncTask generateModMetadata
 
 processResources {
