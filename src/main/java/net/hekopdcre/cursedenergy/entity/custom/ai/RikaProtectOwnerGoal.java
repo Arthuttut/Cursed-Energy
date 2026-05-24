@@ -4,6 +4,7 @@ import net.hekopdcre.cursedenergy.entity.custom.RikaEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 
 import java.util.List;
@@ -24,30 +25,35 @@ public class RikaProtectOwnerGoal extends TargetGoal {
         LivingEntity owner = rika.getOwner();
         if (owner == null)
             return false;
+
         threat = null;
 
-        // prioridade 1: quem atacou o dono agora
+        // Prioridade 1: quem acabou de atacar o dono agora
         LivingEntity attacker = owner.getLastHurtByMob();
-        if (attacker != null && attacker != rika && attacker.isAlive()) {
+        if (attacker != null && attacker != rika && attacker.isAlive()
+                && attacker.distanceTo(owner) < 32) {
             threat = attacker;
             rika.rememberThreat(attacker.getUUID());
             rika.getFuryManager().triggerFury();
             return true;
         }
 
-        // prioridade 2: ameaças da memória que ainda estão vivas por perto
+        // Prioridade 2: ameaças memorizadas que ainda estão ATIVAMENTE atacando o dono
+        // (só reativa se o mob ainda tem target no owner — não persegue quem foi
+        // embora)
         if (rika.level() instanceof ServerLevel serverLevel) {
             for (UUID uuid : rika.getThreatMemory()) {
                 Entity e = serverLevel.getEntity(uuid);
                 if (e instanceof LivingEntity living && living.isAlive()
-                        && living.distanceTo(owner) < 24) {
+                        && living.distanceTo(owner) < 20
+                        && living instanceof Mob mob && mob.getTarget() == owner) {
                     threat = living;
                     return true;
                 }
             }
         }
 
-        // prioridade 3: alguém usando arco apontado para o dono
+        // Prioridade 3: alguém usando arco/besta apontado para o dono, por perto
         List<LivingEntity> nearby = owner.level().getEntitiesOfClass(
                 LivingEntity.class,
                 owner.getBoundingBox().inflate(16),
@@ -63,6 +69,17 @@ public class RikaProtectOwnerGoal extends TargetGoal {
         }
 
         return false;
+    }
+
+    @Override
+    public boolean canContinueToUse() {
+        // Para de usar se o alvo morreu ou sumiu — não fica presa no goal
+        if (threat == null || !threat.isAlive())
+            return false;
+        LivingEntity owner = rika.getOwner();
+        if (owner == null)
+            return false;
+        return threat.distanceTo(owner) < 40;
     }
 
     @Override

@@ -26,24 +26,26 @@ public class RikaThreatDetectionGoal extends TargetGoal {
         LivingEntity owner = rika.getOwner();
         if (owner == null)
             return false;
+
         threat = null;
 
-        // 1. Ataca quem o player atacou por último
+        // 1. Quem o player atacou — mas só se ainda está perto e vivo
         if (owner instanceof Player player) {
             LivingEntity lastHurt = player.getLastHurtMob();
-            if (lastHurt != null && lastHurt != rika && lastHurt.isAlive()) {
+            if (lastHurt != null && lastHurt != rika && lastHurt.isAlive()
+                    && lastHurt.distanceTo(owner) < 32) {
                 threat = lastHurt;
                 return true;
             }
         }
 
-        // Apenas mobs hostis (Monster) próximos — ignora passivos completamente
+        // Apenas mobs hostis próximos
         List<Mob> nearby = owner.level().getEntitiesOfClass(
                 Mob.class,
                 owner.getBoundingBox().inflate(20),
                 e -> e != rika && e.isAlive() && e instanceof Monster);
 
-        // 2. Creeper ignitado tem prioridade máxima
+        // 2. Creeper ignitado — prioridade máxima
         for (Mob mob : nearby) {
             if (mob instanceof Creeper creeper && creeper.isIgnited()) {
                 threat = creeper;
@@ -51,7 +53,16 @@ public class RikaThreatDetectionGoal extends TargetGoal {
             }
         }
 
-        // 3. Ameaças memorizadas (já atacaram o dono antes)
+        // 3. Mob hostil com target no owner — o mais próximo
+        nearby.stream()
+                .filter(e -> e.getTarget() == owner)
+                .min(Comparator.comparingDouble(e -> e.distanceTo(owner)))
+                .ifPresent(e -> threat = e);
+
+        if (threat != null)
+            return true;
+
+        // 4. Ameaças memorizadas que ainda estão perto
         for (Mob mob : nearby) {
             if (rika.isThreatRemembered(mob.getUUID())) {
                 threat = mob;
@@ -59,13 +70,17 @@ public class RikaThreatDetectionGoal extends TargetGoal {
             }
         }
 
-        // 4. Mob hostil que está ativamente mirando no dono
-        nearby.stream()
-                .filter(e -> e.getTarget() == owner)
-                .min(Comparator.comparingDouble(e -> e.distanceTo(owner)))
-                .ifPresent(e -> threat = e);
+        return false;
+    }
 
-        return threat != null;
+    @Override
+    public boolean canContinueToUse() {
+        if (threat == null || !threat.isAlive())
+            return false;
+        LivingEntity owner = rika.getOwner();
+        if (owner == null)
+            return false;
+        return threat.distanceTo(owner) < 40;
     }
 
     @Override
