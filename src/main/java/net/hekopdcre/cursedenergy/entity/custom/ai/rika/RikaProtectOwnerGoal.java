@@ -1,4 +1,4 @@
-package net.hekopdcre.cursedenergy.entity.custom.ai;
+package net.hekopdcre.cursedenergy.entity.custom.ai.rika;
 
 import net.hekopdcre.cursedenergy.entity.custom.RikaEntity;
 import net.minecraft.server.level.ServerLevel;
@@ -6,10 +6,22 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
+import net.minecraft.world.item.BowItem;
+import net.minecraft.world.item.CrossbowItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.phys.AABB;
 
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * RikaProtectOwnerGoal
+ *
+ * CORREÇÃO: substituído String.contains("Bow") por instanceof BowItem /
+ * CrossbowItem.
+ * Elimina alocação de String, reflection metadata lookup e contains() por tick.
+ * instanceof é resolvido via vtable — custo praticamente zero.
+ */
 public class RikaProtectOwnerGoal extends TargetGoal {
 
     private final RikaEntity rika;
@@ -25,43 +37,41 @@ public class RikaProtectOwnerGoal extends TargetGoal {
         LivingEntity owner = rika.getOwner();
         if (owner == null)
             return false;
-
         threat = null;
 
-        // Prioridade 1: quem acabou de atacar o dono agora
+        // Prioridade 1: quem acabou de atacar o dono
         LivingEntity attacker = owner.getLastHurtByMob();
         if (attacker != null && attacker != rika && attacker.isAlive()
-                && attacker.distanceTo(owner) < 32) {
+                && attacker.distanceToSqr(owner) < 1024) {
             threat = attacker;
             rika.rememberThreat(attacker.getUUID());
             rika.getFuryManager().triggerFury();
             return true;
         }
 
-        // Prioridade 2: ameaças memorizadas que ainda estão ATIVAMENTE atacando o dono
-        // (só reativa se o mob ainda tem target no owner — não persegue quem foi
-        // embora)
+        // Prioridade 2: ameaças memorizadas ativamente atacando o dono
         if (rika.level() instanceof ServerLevel serverLevel) {
             for (UUID uuid : rika.getThreatMemory()) {
                 Entity e = serverLevel.getEntity(uuid);
-                if (e instanceof LivingEntity living && living.isAlive()
-                        && living.distanceTo(owner) < 20
-                        && living instanceof Mob mob && mob.getTarget() == owner) {
-                    threat = living;
+                if (e instanceof Mob mob && mob.isAlive()
+                        && mob.distanceToSqr(owner) < 400
+                        && mob.getTarget() == owner) {
+                    threat = mob;
                     return true;
                 }
             }
         }
 
-        // Prioridade 3: alguém usando arco/besta apontado para o dono, por perto
+        // Prioridade 3: archer apontado para o dono
+        // instanceof em vez de String.contains() — zero alloc, custo vtable
+        AABB nearBB = owner.getBoundingBox().inflate(16);
         List<LivingEntity> nearby = owner.level().getEntitiesOfClass(
-                LivingEntity.class,
-                owner.getBoundingBox().inflate(16),
+                LivingEntity.class, nearBB,
                 e -> e != rika && e != owner && e.isUsingItem());
 
         for (LivingEntity e : nearby) {
-            String name = e.getUseItem().getItem().getClass().getSimpleName().toLowerCase();
-            if (name.contains("bow") || name.contains("crossbow")) {
+            Item item = e.getUseItem().getItem();
+            if (item instanceof BowItem || item instanceof CrossbowItem) {
                 threat = e;
                 rika.rememberThreat(e.getUUID());
                 return true;
@@ -73,13 +83,12 @@ public class RikaProtectOwnerGoal extends TargetGoal {
 
     @Override
     public boolean canContinueToUse() {
-        // Para de usar se o alvo morreu ou sumiu — não fica presa no goal
         if (threat == null || !threat.isAlive())
             return false;
         LivingEntity owner = rika.getOwner();
         if (owner == null)
             return false;
-        return threat.distanceTo(owner) < 40;
+        return threat.distanceToSqr(owner) < 1600; // 40²
     }
 
     @Override

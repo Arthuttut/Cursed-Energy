@@ -1,12 +1,16 @@
 {
-  "name": "Vessel",
+  "name": {
+    "translate": "ability.ce.vessel"
+  },
   "icon": "ce:textures/icon/misc/sukuna_finger.png",
   "parent": "ce:cursed_energy_control",
   "abilities": {
     "vessel": {
       "type": "palladium:dummy",
       "properties": {
-        "title": "Vessel",
+        "title": {
+          "translate": "ability.ce.vessel"
+        },
         "icon": "ce:textures/icon/misc/sukuna_finger.png"
       }
     },

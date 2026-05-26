@@ -1,12 +1,14 @@
 {
-    "name": "Cursed Speech",
+    "name": {"translate": "ability.ce.cursed_speech"},
     "icon": "ce:textures/icon/techniques/cursed_speech.png",
     "parent": "ce:cursed_energy_control",
     "abilities": {
         "dont_move": {
             "type": "palladium:command",
             "properties": {
-                "title": "Don't Move",
+                "title": {
+                    "translate": "ability.ce.cursed_speech.dont_move"
+                },
                 "icon": {
                     "type": "palladium:texture",
                     "texture": "ce:textures/icon/misc/cant_walk.png"

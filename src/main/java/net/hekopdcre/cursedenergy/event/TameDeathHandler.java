@@ -76,6 +76,7 @@ public class TameDeathHandler {
 
         if (rika instanceof RikaEntity rikaEntity) {
             rikaEntity.setOwnerUUID(player.getUUID());
+            player.addTag("rika_cursed"); // <- adiciona a tag ao dono
         }
 
         serverLevel.addFreshEntity(rika);

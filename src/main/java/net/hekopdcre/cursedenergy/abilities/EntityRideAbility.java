@@ -17,15 +17,12 @@ public class EntityRideAbility extends Ability {
             new EntityRideAbility(
                     AbilityProperties.BASIC,
                     AbilityStateManager.EMPTY,
-                    List.of()
-            )
-    );
+                    List.of()));
 
     public EntityRideAbility(
             AbilityProperties properties,
             AbilityStateManager stateManager,
-            List<EnergyBarUsage> energyBarUsages
-    ) {
+            List<EnergyBarUsage> energyBarUsages) {
         super(properties, stateManager, energyBarUsages);
     }
 

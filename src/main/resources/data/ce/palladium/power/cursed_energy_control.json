@@ -1,5 +1,5 @@
 {
-  "name": "Cursed Energy Control",
+  "name": {"translate": "ability.ce.cursed_energy_control"},
   "icon": "ce:textures/icon/misc/cursed_energy.png",
   "ability_bar_texture": "ce:textures/gui/ability_bars/cursed_energy_control.png",
   "abilities": {
@@ -47,7 +47,9 @@
     "divergent_fist": {
       "type": "ce:divergent_fist",
       "properties": {
-        "title": "Divergent Fist",
+        "title": {
+          "translate": "ability.ce.divergent_fist"
+        },
         "icon": {
           "type": "palladium:texture",
           "texture": "ce:textures/icon/misc/divergent_fist.png"
@@ -83,7 +85,9 @@
     "body_reinforcement": {
       "type": "palladium:attribute_modifier",
       "properties": {
-        "title": "Body Reinforcement",
+        "title": {
+          "translate": "ability.ce.cursed_energy_control.body_reinforcement"
+        },
         "icon": {
           "type": "palladium:texture",
           "texture": "ce:textures/icon/misc/body_reinforcement.png"

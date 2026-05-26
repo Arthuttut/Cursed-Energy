@@ -1,16 +1,27 @@
-package net.hekopdcre.cursedenergy.entity.custom.ai;
+package net.hekopdcre.cursedenergy.entity.custom.ai.rika;
 
 import net.hekopdcre.cursedenergy.entity.custom.RikaEntity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.Comparator;
 import java.util.List;
 
+/**
+ * RikaThreatDetectionGoal — versão final com OwnerScanCache.
+ *
+ * O scan de Mobs hostis é agora servido pelo OwnerScanCache compartilhado.
+ * Se RikaEntity.checkIncomingProjectiles() já rodou neste goal tick (ou no tick
+ * anterior dentro do TTL), getEntitiesOfClass não é chamado aqui — custo zero.
+ *
+ * A lógica de prioridade é idêntica à versão anterior:
+ * 1. lastHurtMob do owner (player atacou alguém)
+ * 2. Creeper ignitado (retorno imediato)
+ * 3. Mob com target no owner, mais próximo (O(n) sem stream)
+ * 4. Ameaça memorizada
+ */
 public class RikaThreatDetectionGoal extends TargetGoal {
 
     private final RikaEntity rika;
@@ -29,40 +40,44 @@ public class RikaThreatDetectionGoal extends TargetGoal {
 
         threat = null;
 
-        // 1. Quem o player atacou — mas só se ainda está perto e vivo
+        // Prioridade 1: alvo que o owner atacou recentemente
         if (owner instanceof Player player) {
             LivingEntity lastHurt = player.getLastHurtMob();
             if (lastHurt != null && lastHurt != rika && lastHurt.isAlive()
-                    && lastHurt.distanceTo(owner) < 32) {
+                    && lastHurt.distanceToSqr(owner) < 1024) {
                 threat = lastHurt;
                 return true;
             }
         }
 
-        // Apenas mobs hostis próximos
-        List<Mob> nearby = owner.level().getEntitiesOfClass(
-                Mob.class,
-                owner.getBoundingBox().inflate(20),
-                e -> e != rika && e.isAlive() && e instanceof Monster);
+        // Scan compartilhado — zero custo se já populado neste tick
+        OwnerScanCache.ScanResult scan = OwnerScanCache.get(owner, rika.tickCount, rika);
+        List<Mob> nearby = scan.hostileMobs;
 
-        // 2. Creeper ignitado — prioridade máxima
+        LivingEntity closestTargetingOwner = null;
+        double closestDistSq = Double.MAX_VALUE;
+
         for (Mob mob : nearby) {
+            // Prioridade 2: Creeper ignitado
             if (mob instanceof Creeper creeper && creeper.isIgnited()) {
                 threat = creeper;
                 return true;
             }
+
+            // Prioridade 3: mob atacando owner — raio 20 (400 distSq)
+            double distSq = mob.distanceToSqr(owner);
+            if (distSq < 400 && mob.getTarget() == owner && distSq < closestDistSq) {
+                closestDistSq = distSq;
+                closestTargetingOwner = mob;
+            }
         }
 
-        // 3. Mob hostil com target no owner — o mais próximo
-        nearby.stream()
-                .filter(e -> e.getTarget() == owner)
-                .min(Comparator.comparingDouble(e -> e.distanceTo(owner)))
-                .ifPresent(e -> threat = e);
-
-        if (threat != null)
+        if (closestTargetingOwner != null) {
+            threat = closestTargetingOwner;
             return true;
+        }
 
-        // 4. Ameaças memorizadas que ainda estão perto
+        // Prioridade 4: ameaças memorizadas dentro do raio 48 (já filtrado no cache)
         for (Mob mob : nearby) {
             if (rika.isThreatRemembered(mob.getUUID())) {
                 threat = mob;
@@ -80,7 +95,7 @@ public class RikaThreatDetectionGoal extends TargetGoal {
         LivingEntity owner = rika.getOwner();
         if (owner == null)
             return false;
-        return threat.distanceTo(owner) < 40;
+        return threat.distanceToSqr(owner) < 4096; // 64²
     }
 
     @Override

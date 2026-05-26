@@ -1,7 +1,12 @@
 package net.hekopdcre.cursedenergy.entity.custom;
 
 import net.hekopdcre.cursedenergy.entity.ModEntities;
-import net.hekopdcre.cursedenergy.entity.custom.ai.*;
+import net.hekopdcre.cursedenergy.entity.custom.ai.rika.OwnerScanCache;
+import net.hekopdcre.cursedenergy.entity.custom.ai.rika.RikaCombatGoal;
+import net.hekopdcre.cursedenergy.entity.custom.ai.rika.RikaFollowOwnerGoal;
+import net.hekopdcre.cursedenergy.entity.custom.ai.rika.RikaFuryManager;
+import net.hekopdcre.cursedenergy.entity.custom.ai.rika.RikaProtectOwnerGoal;
+import net.hekopdcre.cursedenergy.entity.custom.ai.rika.RikaThreatDetectionGoal;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -36,13 +41,30 @@ import java.util.*;
 
 public class RikaEntity extends PathfinderMob implements GeoEntity {
 
+    // -----------------------------------------------------------------------
+    // ANIMATIONS
+    // -----------------------------------------------------------------------
+
     private static final RawAnimation IDLE_ANIM = RawAnimation.begin().thenLoop("animation.rika.idle");
+    private static final RawAnimation MOVE_ANIM = RawAnimation.begin().thenLoop("animation.rika.move");
+    private static final RawAnimation ATTACK_ANIM = RawAnimation.begin().thenLoop("animation.rika.attack");
 
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
-    private static final EntityDataAccessor<Boolean> FURY_MODE = SynchedEntityData.defineId(
-            RikaEntity.class,
+    // -----------------------------------------------------------------------
+    // SYNCHED DATA
+    // -----------------------------------------------------------------------
+
+    private static final EntityDataAccessor<Boolean> FURY_MODE = SynchedEntityData.defineId(RikaEntity.class,
             EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> IS_ATTACKING = SynchedEntityData.defineId(RikaEntity.class,
+            EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> IS_MOVING = SynchedEntityData.defineId(RikaEntity.class,
+            EntityDataSerializers.BOOLEAN);
+
+    // -----------------------------------------------------------------------
+    // FIELDS
+    // -----------------------------------------------------------------------
 
     private UUID ownerUUID;
     private LivingEntity cachedOwner;
@@ -51,7 +73,6 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
 
     private int dashCooldown = 0;
     private int projectileInterceptCooldown = 0;
-
     private boolean superpowerApplied = false;
 
     // -----------------------------------------------------------------------
@@ -69,12 +90,18 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
     };
 
     // -----------------------------------------------------------------------
-    // SCHEDULERS
+    // SCHEDULER INTERVALS
     // -----------------------------------------------------------------------
 
-    private static final int PROJECTILE_CHECK_INTERVAL = 1;
-    private static final int THREAT_CLEANUP_INTERVAL = 200;
-    private static final int HEALTH_CHECK_INTERVAL = 20;
+    private static final int PROJECTILE_CHECK_INTERVAL = 2;
+    private static final int THREAT_CLEANUP_INTERVAL = 400;
+    private static final int HEALTH_CHECK_INTERVAL = 40;
+    private static final int AERIAL_PURSUIT_INTERVAL = 2;
+    private static final int SCAN_CACHE_PURGE_INTERVAL = 400;
+
+    // Guarded sync flags — evita entityData.set quando valor não mudou
+    private boolean lastAttackingFlag = false;
+    private boolean lastMovingFlag = false;
 
     // -----------------------------------------------------------------------
     // CONSTRUCTOR
@@ -82,6 +109,18 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
 
     public RikaEntity(EntityType<? extends PathfinderMob> entityType, Level level) {
         super(entityType, level);
+    }
+
+    // -----------------------------------------------------------------------
+    // SYNCHED DATA SETUP
+    // -----------------------------------------------------------------------
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(FURY_MODE, false);
+        builder.define(IS_ATTACKING, false);
+        builder.define(IS_MOVING, false);
     }
 
     // -----------------------------------------------------------------------
@@ -93,19 +132,12 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
         return true;
     }
 
-    @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(FURY_MODE, false);
-    }
-
     // -----------------------------------------------------------------------
     // GOALS
     // -----------------------------------------------------------------------
 
     @Override
     protected void registerGoals() {
-
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(2, new RikaCombatGoal(this));
         this.goalSelector.addGoal(3, new RikaFollowOwnerGoal(this));
@@ -122,86 +154,99 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
 
     @Override
     public void tick() {
-
         super.tick();
 
         this.clearFire();
         this.fallDistance = 0;
 
-        if (!this.level().isClientSide()) {
+        if (this.level().isClientSide())
+            return;
 
-            applySuperpowerOnce();
+        applySuperpowerOnce();
 
-            // reseta gravidade se não há alvo aéreo
-            LivingEntity target = this.getTarget();
-            if (target == null || target.onGround()) {
-                this.setNoGravity(false);
-            }
+        if (dashCooldown > 0)
+            dashCooldown--;
+        if (projectileInterceptCooldown > 0)
+            projectileInterceptCooldown--;
 
-            if (dashCooldown > 0)
-                dashCooldown--;
+        furyManager.tick();
 
-            if (projectileInterceptCooldown > 0)
-                projectileInterceptCooldown--;
+        LivingEntity target = this.getTarget();
+        int tc = this.tickCount;
 
-            furyManager.tick();
-
-            tickAerialPursuit();
-
-            int tc = this.tickCount;
-
-            if (tc % PROJECTILE_CHECK_INTERVAL == 0)
-                checkIncomingProjectiles();
-
-            if (tc % HEALTH_CHECK_INTERVAL == 0)
-                updateBehaviorByOwnerHealth();
-
-            if (tc % THREAT_CLEANUP_INTERVAL == 0)
-                cleanExpiredThreats();
+        if (tc % AERIAL_PURSUIT_INTERVAL == 0) {
+            tickAerialPursuit(target);
         }
+
+        if (target == null || target.onGround()) {
+            this.setNoGravity(false);
+        }
+
+        // Guarded animation sync — zero packet quando estado não muda
+        boolean wantsAttacking = target != null
+                && this.distanceToSqr(target) < 9.0
+                && this.isAggressive();
+        boolean wantsMoving = this.getNavigation().isInProgress();
+
+        if (wantsAttacking != lastAttackingFlag) {
+            entityData.set(IS_ATTACKING, wantsAttacking);
+            lastAttackingFlag = wantsAttacking;
+        }
+        if (wantsMoving != lastMovingFlag) {
+            entityData.set(IS_MOVING, wantsMoving);
+            lastMovingFlag = wantsMoving;
+        }
+
+        if (tc % PROJECTILE_CHECK_INTERVAL == 0)
+            checkIncomingProjectiles();
+        if (tc % HEALTH_CHECK_INTERVAL == 0)
+            updateBehaviorByOwnerHealth();
+        if (tc % THREAT_CLEANUP_INTERVAL == 0)
+            cleanExpiredThreats();
+        if (tc % SCAN_CACHE_PURGE_INTERVAL == 0)
+            OwnerScanCache.purgeStale(tc);
     }
 
     // -----------------------------------------------------------------------
     // AERIAL PURSUIT
     // -----------------------------------------------------------------------
 
-    private void tickAerialPursuit() {
-
-        LivingEntity target = this.getTarget();
-
-        if (target == null)
-            return;
-
-        if (target.onGround())
+    private void tickAerialPursuit(LivingEntity target) {
+        if (target == null || target.onGround())
             return;
 
         LivingEntity owner = getOwner();
         if (owner != null) {
             boolean targetingOwner = (target instanceof Mob mob && mob.getTarget() == owner)
                     || target.getLastHurtMob() == owner;
-
             if (!targetingOwner)
                 return;
         }
 
-        double dist = this.distanceTo(target);
+        double distSq = this.distanceToSqr(target);
+        if (distSq < 6.25)
+            return; // < 2.5²
 
-        if (dist < 2.5)
-            return;
+        double dx = target.getX() - this.getX();
+        double dy = target.getY() - this.getY();
+        double dz = target.getZ() - this.getZ();
+        double inv = 1.0 / Math.sqrt(distSq);
 
-        Vec3 toTarget = target.position().subtract(this.position()).normalize();
+        double nx = dx * inv;
+        double ny = dy * inv;
+        double nz = dz * inv;
 
         double step = this.isFuryMode() ? 1.8 : 1.2;
 
-        this.teleportTo(
-                this.getX() + toTarget.x * step,
-                this.getY() + toTarget.y * step,
-                this.getZ() + toTarget.z * step);
+        // setPos em vez de teleportTo — menos nuclear, sem packet de teleporte,
+        // sem chunk resend, sem rubberband client/server
+        this.setPos(
+                this.getX() + nx * step,
+                this.getY() + ny * step,
+                this.getZ() + nz * step);
 
-        // olha para o projétil/alvo
-        Vec3 dir = toTarget;
-        float yaw = (float) (Math.toDegrees(Math.atan2(dir.z, dir.x)) - 90F);
-        float pitch = (float) -Math.toDegrees(Math.asin(dir.y));
+        float yaw = (float) (Math.toDegrees(Math.atan2(nz, nx)) - 90F);
+        float pitch = (float) -Math.toDegrees(Math.asin(Math.max(-1.0, Math.min(1.0, ny))));
 
         this.setYRot(yaw);
         this.yRotO = yaw;
@@ -219,10 +264,8 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
     // -----------------------------------------------------------------------
 
     private void applySuperpowerOnce() {
-
         if (superpowerApplied)
             return;
-
         if (!(this.level() instanceof ServerLevel serverLevel))
             return;
 
@@ -230,21 +273,17 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
             var registry = serverLevel.registryAccess()
                     .lookup(PalladiumRegistryKeys.POWER)
                     .orElse(null);
-
             if (registry == null)
                 return;
 
-            var powerId = Identifier.fromNamespaceAndPath("ce", "rika");
-
             var key = ResourceKey.create(
                     PalladiumRegistryKeys.POWER,
-                    powerId);
+                    Identifier.fromNamespaceAndPath("ce", "rika"));
 
             registry.get(key).ifPresent(holder -> {
                 SuperpowerUtil.setSuperpower(this, holder);
                 superpowerApplied = true;
             });
-
         } catch (Exception ignored) {
         }
     }
@@ -254,17 +293,12 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
     // -----------------------------------------------------------------------
 
     private void updateBehaviorByOwnerHealth() {
-
         LivingEntity owner = getOwner();
-
         if (owner == null)
             return;
 
         float healthPct = owner.getHealth() / owner.getMaxHealth();
-
-        if (healthPct < 0.3f
-                && !furyManager.isActive()
-                && !furyManager.isOnCooldown()) {
+        if (healthPct < 0.3f && !furyManager.isActive() && !furyManager.isOnCooldown()) {
             furyManager.triggerFury();
         }
     }
@@ -274,114 +308,148 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
     // -----------------------------------------------------------------------
 
     private void checkIncomingProjectiles() {
-
         LivingEntity owner = getOwner();
-
-        if (owner == null)
+        if (owner == null || projectileInterceptCooldown > 0)
             return;
 
-        if (projectileInterceptCooldown > 0)
-            return;
-
-        List<Projectile> projectiles = this.level().getEntitiesOfClass(
-                Projectile.class,
-                owner.getBoundingBox().inflate(32),
-                p -> {
-
-                    String cn = p.getClass().getName();
-
-                    boolean dangerous = cn.contains("Arrow")
-                            || cn.contains("Trident")
-                            || cn.contains("Fireball")
-                            || cn.contains("WitherSkull")
-                            || cn.contains("ShulkerBullet")
-                            || cn.contains("DragonFireball")
-                            || cn.contains("LlamaSpit");
-
-                    if (!dangerous)
-                        return false;
-
-                    Vec3 motion = p.getDeltaMovement();
-
-                    if (motion.lengthSqr() < 0.0001)
-                        return false;
-
-                    Vec3 toOwner = owner.position().subtract(p.position());
-
-                    if (toOwner.lengthSqr() < 0.0001)
-                        return false;
-
-                    if (p.getOwner() == owner)
-                        return false;
-
-                    double dot = motion.normalize().dot(toOwner.normalize());
-
-                    return dot > 0.7 // limiar mais generoso para não deixar passar
-                            && motion.dot(toOwner) > 0
-                            && toOwner.length() < 32;
-                });
+        OwnerScanCache.ScanResult scan = OwnerScanCache.get(owner, this.tickCount, this);
+        List<Projectile> projectiles = scan.dangerousProjectiles;
 
         if (projectiles.isEmpty())
             return;
 
-        // ordena pelo mais próximo de impactar o dono
-        projectiles.sort(Comparator.comparingDouble(p -> {
-            double dist = p.distanceTo(owner);
-            double spd = p.getDeltaMovement().length();
-            return spd > 0.001 ? dist / spd : Double.MAX_VALUE;
-        }));
+        // Seleção O(n) do projétil mais urgente — sem sort
+        Projectile mostUrgent = null;
+        double minArrival = Double.MAX_VALUE;
 
         for (Projectile p : projectiles) {
-            if (p.getOwner() instanceof LivingEntity shooter) {
-
-                rememberThreat(shooter.getUUID());
-
-                if (this.getTarget() == null) {
-                    this.setTarget(shooter);
-                    furyManager.triggerFury();
-                }
+            double dist = p.distanceTo(owner);
+            double spd = p.getDeltaMovement().length();
+            double arrival = spd > 0.001 ? dist / spd : Double.MAX_VALUE;
+            if (arrival < minArrival) {
+                minArrival = arrival;
+                mostUrgent = p;
             }
         }
 
-        // intercepta todos os projéteis detectados, não só o primeiro
-        for (Projectile proj : projectiles) {
+        // Reagir a atiradores
+        for (Projectile p : projectiles) {
+            if (!(p.getOwner() instanceof LivingEntity shooter))
+                continue;
 
-            Vec3 projPos = proj.position();
-            Vec3 projMotion = proj.getDeltaMovement();
-            Vec3 ownerPos = owner.position();
+            rememberThreat(shooter.getUUID());
 
-            double distToOwner = projPos.distanceTo(ownerPos);
-            double speed = projMotion.length();
-            double ticksToImpact = speed > 0.001 ? distToOwner / speed : 1.0;
-            double t = Math.min(ticksToImpact * 0.5, 8.0);
+            LivingEntity current = this.getTarget();
+            if (current == null || !current.isAlive() || current != shooter) {
+                this.setTarget(shooter);
 
-            Vec3 futurePos = projPos.add(projMotion.scale(t));
-            Vec3 interceptDir = ownerPos.subtract(futurePos).normalize();
-            Vec3 intercept = ownerPos.subtract(interceptDir.scale(1.0));
+                if (dashCooldown == 0) {
+                    double dx = shooter.getX() - this.getX();
+                    double dz = shooter.getZ() - this.getZ();
+                    double len = Math.sqrt(dx * dx + dz * dz);
+                    if (len > 0.001) {
+                        double dashPower = isFuryMode() ? 3.5 : 3.0;
+                        double inv = dashPower / len;
+                        this.setDeltaMovement(dx * inv, 0.3, dz * inv);
+                        this.setDashCooldown(40);
+                    }
+                }
 
-            this.teleportTo(intercept.x, intercept.y, intercept.z);
-
-            // olha na direção de onde o projétil vem
-            Vec3 facingDir = projMotion.normalize().reverse();
-            float yaw = (float) (Math.toDegrees(Math.atan2(facingDir.z, facingDir.x)) - 90F);
-            float pitch = (float) -Math.toDegrees(Math.asin(
-                    Math.max(-1.0, Math.min(1.0, facingDir.y))));
-
-            this.setYRot(yaw);
-            this.yRotO = yaw;
-            this.setYHeadRot(yaw);
-            this.setXRot(pitch);
-            this.xRotO = pitch;
-
-            // faz a Rika ficar entre o projétil e o dono
-            this.setNoGravity(true);
-            this.fallDistance = 0;
-            this.setDeltaMovement(Vec3.ZERO);
-
-            break; // teleporta para o mais prioritário; os outros serão pegos nos próximos ticks
+                furyManager.triggerFury();
+                break;
+            }
         }
 
-        projectileInterceptCooldown = 2; // cooldown menor = reação mais rápida
+        // Interceptar o projétil mais urgente
+        if (mostUrgent != null) {
+            interceptProjectile(mostUrgent, owner);
+            projectileInterceptCooldown = 2;
+        }
+    }
+
+    private void interceptProjectile(Projectile proj, LivingEntity owner) {
+        // Posições inline — sem Vec3 intermediário
+        double projX = proj.getX();
+        double projY = proj.getY();
+        double projZ = proj.getZ();
+
+        double motX = proj.getDeltaMovement().x;
+        double motY = proj.getDeltaMovement().y;
+        double motZ = proj.getDeltaMovement().z;
+
+        double ownerX = owner.getX();
+        double ownerY = owner.getY();
+        double ownerZ = owner.getZ();
+
+        // Distância projétil → owner
+        double dox = ownerX - projX;
+        double doy = ownerY - projY;
+        double doz = ownerZ - projZ;
+        double dist = Math.sqrt(dox * dox + doy * doy + doz * doz);
+
+        double speed = Math.sqrt(motX * motX + motY * motY + motZ * motZ);
+        double t = Math.min((speed > 0.001 ? dist / speed : 1.0) * 0.5, 8.0);
+
+        // Posição futura do projétil
+        double futX = projX + motX * t;
+        double futY = projY + motY * t;
+        double futZ = projZ + motZ * t;
+
+        // Direção owner → futurePos (interceptDir inverso)
+        double idX = ownerX - futX;
+        double idY = ownerY - futY;
+        double idZ = ownerZ - futZ;
+        double idLen = Math.sqrt(idX * idX + idY * idY + idZ * idZ);
+        if (idLen > 0.001) {
+            idX /= idLen;
+            idY /= idLen;
+            idZ /= idLen;
+        }
+
+        // Ponto de intercepção
+        double icX = ownerX - idX;
+        double icY = ownerY - idY;
+        double icZ = ownerZ - idZ;
+
+        // setPos — mesma razão do aerial pursuit
+        this.setPos(icX, icY, icZ);
+
+        // Face the incoming projectile
+        double fx = (speed > 0.001) ? -motX / speed : 0;
+        double fy = (speed > 0.001) ? -motY / speed : 0;
+        double fz = (speed > 0.001) ? -motZ / speed : 0;
+
+        float yaw = (float) (Math.toDegrees(Math.atan2(fz, fx)) - 90F);
+        float pitch = (float) -Math.toDegrees(Math.asin(Math.max(-1.0, Math.min(1.0, fy))));
+
+        this.setYRot(yaw);
+        this.yRotO = yaw;
+        this.setYHeadRot(yaw);
+        this.setXRot(pitch);
+        this.xRotO = pitch;
+        this.setNoGravity(true);
+        this.fallDistance = 0;
+        this.setDeltaMovement(Vec3.ZERO);
+    }
+
+    // -----------------------------------------------------------------------
+    // DANGER CHECK
+    // -----------------------------------------------------------------------
+
+    public boolean isDangerNearOwner() {
+        LivingEntity owner = getOwner();
+        if (owner == null)
+            return false;
+
+        OwnerScanCache.ScanResult scan = OwnerScanCache.get(owner, this.tickCount, this);
+
+        for (Mob mob : scan.hostileMobs) {
+            if (mob.getTarget() == owner && mob.distanceToSqr(owner) < 256) {
+                return true;
+            }
+        }
+
+        return !scan.dangerousProjectiles.isEmpty();
     }
 
     // -----------------------------------------------------------------------
@@ -389,19 +457,14 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
     // -----------------------------------------------------------------------
 
     private void cleanExpiredThreats() {
-
         if (!(this.level() instanceof ServerLevel serverLevel))
             return;
-
         int now = this.tickCount;
 
         threatMemory.entrySet().removeIf(entry -> {
-
             if (now - entry.getValue() > THREAT_EXPIRY_TICKS)
                 return true;
-
             Entity e = serverLevel.getEntity(entry.getKey());
-
             return e == null || !e.isAlive();
         });
     }
@@ -427,33 +490,51 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
     // -----------------------------------------------------------------------
 
     public LivingEntity getOwner() {
-
         if (ownerUUID == null)
             return null;
-
         if (cachedOwner != null && cachedOwner.isAlive())
             return cachedOwner;
 
         if (this.level() instanceof ServerLevel serverLevel) {
-
             Entity e = serverLevel.getEntity(ownerUUID);
-
             if (e instanceof LivingEntity living) {
                 cachedOwner = living;
                 return cachedOwner;
             }
         }
-
         return null;
     }
 
     public void setOwnerUUID(UUID uuid) {
         this.ownerUUID = uuid;
         this.cachedOwner = null;
+        if (uuid != null)
+            OwnerScanCache.invalidate(uuid);
     }
 
     public UUID getOwnerUUID() {
         return ownerUUID;
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level,
+            net.minecraft.world.damagesource.DamageSource source,
+            float amount) {
+        boolean result = super.hurtServer(level, source, amount);
+
+        if (result
+                && source.getEntity() instanceof LivingEntity attacker
+                && attacker != this
+                && attacker != getOwner()) {
+            rememberThreat(attacker.getUUID());
+            LivingEntity current = this.getTarget();
+            if (current == null || !current.isAlive()) {
+                this.setTarget(attacker);
+                getFuryManager().triggerFury();
+            }
+        }
+
+        return result;
     }
 
     // -----------------------------------------------------------------------
@@ -465,17 +546,15 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
     }
 
     public void setFuryMode(boolean fury) {
-
         entityData.set(FURY_MODE, fury);
-
         if (fury) {
-            getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.65);
+            getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.73);
             getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(80.0);
             getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
         } else {
-            getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.38);
+            getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.64);
             getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(45.0);
-            getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(0.5);
+            getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(0.6);
         }
     }
 
@@ -492,25 +571,32 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
     }
 
     // -----------------------------------------------------------------------
+    // ANIMATION FLAGS
+    // -----------------------------------------------------------------------
+
+    public boolean isAttackingAnim() {
+        return entityData.get(IS_ATTACKING);
+    }
+
+    public boolean isMovingAnim() {
+        return entityData.get(IS_MOVING);
+    }
+
+    // -----------------------------------------------------------------------
     // SAVE / LOAD
     // -----------------------------------------------------------------------
 
     @Override
     public void addAdditionalSaveData(ValueOutput output) {
-
         super.addAdditionalSaveData(output);
-
         if (ownerUUID != null)
             output.store("OwnerUUID", UUIDUtil.CODEC, ownerUUID);
     }
 
     @Override
     public void readAdditionalSaveData(ValueInput input) {
-
         super.readAdditionalSaveData(input);
-
         input.read("OwnerUUID", UUIDUtil.CODEC).ifPresent(uuid -> ownerUUID = uuid);
-
         superpowerApplied = false;
     }
 
@@ -519,7 +605,6 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
     // -----------------------------------------------------------------------
 
     public static AttributeSupplier.Builder createAttributes() {
-
         return PathfinderMob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 350.0)
                 .add(Attributes.MOVEMENT_SPEED, 0.38)
@@ -540,11 +625,15 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-
         controllers.add(new AnimationController<>(
-                "main_controller",
-                0,
-                test -> test.setAndContinue(IDLE_ANIM)));
+                "main_controller", 2,
+                state -> {
+                    if (isAttackingAnim())
+                        return state.setAndContinue(ATTACK_ANIM);
+                    if (isMovingAnim())
+                        return state.setAndContinue(MOVE_ANIM);
+                    return state.setAndContinue(IDLE_ANIM);
+                }));
     }
 
     @Override

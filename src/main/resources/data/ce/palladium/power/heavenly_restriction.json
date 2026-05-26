@@ -1,5 +1,5 @@
 {
-    "name": "Celestial Restriction",
+    "name": { "translate": "ability.heavenly_restriction"},
     "icon": "ce:textures/icon/misc/no_cursed_energy.png",
     "animation_controller": {
         "special": "ce:run"
