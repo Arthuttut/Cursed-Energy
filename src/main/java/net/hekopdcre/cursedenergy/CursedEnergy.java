@@ -6,7 +6,6 @@ import net.hekopdcre.cursedenergy.abilities.DomainExpansionAbility;
 import net.hekopdcre.cursedenergy.client.ClientEvents;
 import net.hekopdcre.cursedenergy.entity.ModEntities;
 import net.hekopdcre.cursedenergy.entity.custom.RikaEntity;
-import net.hekopdcre.cursedenergy.event.SummonDieEvent;
 import net.hekopdcre.cursedenergy.item.ModItems;
 import net.hekopdcre.cursedenergy.network.FlattenClientHandler;
 import net.hekopdcre.cursedenergy.network.FlattenPayload;
@@ -32,7 +31,6 @@ public class CursedEnergy {
         modEventBus.addListener(RikaEntity::onRegisterAttributes);
         NeoForge.EVENT_BUS.register(RandomInitializer.class);
         NeoForge.EVENT_BUS.register(LateDamage.class);
-        NeoForge.EVENT_BUS.register(SummonDieEvent.class); // <- evento de morte
         NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post event) -> {
             for (ServerLevel level : event.getServer().getAllLevels()) {
                 DomainExpansionAbility.globalTick(level);

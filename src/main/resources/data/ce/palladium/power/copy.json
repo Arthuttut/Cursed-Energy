@@ -2,12 +2,19 @@
     "name": {
         "translate": "ability.ce.copy"
     },
-    "icon": "ce:textures/icon/techniques/comedian.png",
+    "icon": "ce:textures/item/rikas_ring.png",
+    "ability_bar_texture": "ce:textures/gui/ability_bars/copy.png",
     "parent": "ce:cursed_energy_control",
     "abilities": {
         "rika": {
             "type": "ce:summon",
             "properties": {
+                "title": "Rika",
+                "icon": {
+                    "type": "palladium:texture",
+                    "texture": "ce:textures/icon/techniques/rika.png"
+                },
+                "color": "magenta",
                 "list_index": 4
             },
             "entity": "ce:rika",
@@ -15,8 +22,8 @@
             "spawn_distance": 2,
             "spawn_delay_ticks": 10,
             "tame": true,
-            "spawn_particle": "minecraft:portal",
-            "spawn_particle_count": 180,
+            "spawn_particle": "minecraft:large_smoke",
+            "spawn_particle_count": 250,
             "freeze_until_spawn": true,
             "state": {
                 "enabling": {
@@ -24,6 +31,10 @@
                     "behaviour": "toggle",
                     "cooldown": 6000,
                     "time": 6000
+                },
+                "unlocking": {
+                    "type": "palladium:has_tag",
+                    "tag": "rika_cursed"
                 }
             }
         }

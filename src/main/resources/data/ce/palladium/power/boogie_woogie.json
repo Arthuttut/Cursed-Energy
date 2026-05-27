@@ -25,7 +25,8 @@
         "enabling": {
           "type": "palladium:key_bind",
           "behaviour": "activation",
-          "cooldown": 6
+          "cooldown": 6,
+          "time": 1
         },
         "unlocking": {
           "type": "palladium:objective_score",

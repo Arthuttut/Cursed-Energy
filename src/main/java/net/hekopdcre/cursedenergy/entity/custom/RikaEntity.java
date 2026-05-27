@@ -3,10 +3,12 @@ package net.hekopdcre.cursedenergy.entity.custom;
 import net.hekopdcre.cursedenergy.entity.ModEntities;
 import net.hekopdcre.cursedenergy.entity.custom.ai.rika.OwnerScanCache;
 import net.hekopdcre.cursedenergy.entity.custom.ai.rika.RikaCombatGoal;
+import net.hekopdcre.cursedenergy.entity.custom.ai.rika.RikaFlightManager;
 import net.hekopdcre.cursedenergy.entity.custom.ai.rika.RikaFollowOwnerGoal;
 import net.hekopdcre.cursedenergy.entity.custom.ai.rika.RikaFuryManager;
 import net.hekopdcre.cursedenergy.entity.custom.ai.rika.RikaProtectOwnerGoal;
 import net.hekopdcre.cursedenergy.entity.custom.ai.rika.RikaThreatDetectionGoal;
+import net.hekopdcre.cursedenergy.summon.ISummonedEntity;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -39,7 +41,7 @@ import com.geckolib.util.GeckoLibUtil;
 
 import java.util.*;
 
-public class RikaEntity extends PathfinderMob implements GeoEntity {
+public class RikaEntity extends PathfinderMob implements GeoEntity, ISummonedEntity {
 
     // -----------------------------------------------------------------------
     // ANIMATIONS
@@ -68,8 +70,10 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
 
     private UUID ownerUUID;
     private LivingEntity cachedOwner;
+    private Identifier summonAbilityId;
 
     private final RikaFuryManager furyManager = new RikaFuryManager(this);
+    private final RikaFlightManager flightManager = new RikaFlightManager(this);
 
     private int dashCooldown = 0;
     private int projectileInterceptCooldown = 0;
@@ -99,7 +103,7 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
     private static final int AERIAL_PURSUIT_INTERVAL = 2;
     private static final int SCAN_CACHE_PURGE_INTERVAL = 400;
 
-    // Guarded sync flags — evita entityData.set quando valor não mudou
+    // Guarded sync flags
     private boolean lastAttackingFlag = false;
     private boolean lastMovingFlag = false;
 
@@ -170,23 +174,37 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
             projectileInterceptCooldown--;
 
         furyManager.tick();
+        flightManager.tick();
 
         LivingEntity target = this.getTarget();
         int tc = this.tickCount;
 
-        if (tc % AERIAL_PURSUIT_INTERVAL == 0) {
+        if (tc % AERIAL_PURSUIT_INTERVAL == 0 && !flightManager.isFlying()) {
             tickAerialPursuit(target);
         }
 
-        if (target == null || target.onGround()) {
+        if (!flightManager.isFlying() && (target == null || target.onGround())) {
             this.setNoGravity(false);
         }
 
-        // Guarded animation sync — zero packet quando estado não muda
+        // Guarded animation sync
         boolean wantsAttacking = target != null
                 && this.distanceToSqr(target) < 9.0
                 && this.isAggressive();
-        boolean wantsMoving = this.getNavigation().isInProgress();
+
+        // -----------------------------------------------------------------------
+        // ALTERAÇÃO CIRÚRGICA: detecta movimento durante voo via deltaMovement
+        // horizontal, pois a navegação fica parada (stop()) durante o voo.
+        // No chão mantém o comportamento original via getNavigation().isInProgress().
+        // -----------------------------------------------------------------------
+        boolean wantsMoving;
+        if (flightManager.isFlying()) {
+            Vec3 mov = this.getDeltaMovement();
+            wantsMoving = (mov.x * mov.x + mov.z * mov.z) > 0.001;
+        } else {
+            wantsMoving = this.getNavigation().isInProgress();
+        }
+        // -----------------------------------------------------------------------
 
         if (wantsAttacking != lastAttackingFlag) {
             entityData.set(IS_ATTACKING, wantsAttacking);
@@ -225,7 +243,7 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
 
         double distSq = this.distanceToSqr(target);
         if (distSq < 6.25)
-            return; // < 2.5²
+            return;
 
         double dx = target.getX() - this.getX();
         double dy = target.getY() - this.getY();
@@ -238,8 +256,6 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
 
         double step = this.isFuryMode() ? 1.8 : 1.2;
 
-        // setPos em vez de teleportTo — menos nuclear, sem packet de teleporte,
-        // sem chunk resend, sem rubberband client/server
         this.setPos(
                 this.getX() + nx * step,
                 this.getY() + ny * step,
@@ -318,7 +334,6 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
         if (projectiles.isEmpty())
             return;
 
-        // Seleção O(n) do projétil mais urgente — sem sort
         Projectile mostUrgent = null;
         double minArrival = Double.MAX_VALUE;
 
@@ -332,7 +347,6 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
             }
         }
 
-        // Reagir a atiradores
         for (Projectile p : projectiles) {
             if (!(p.getOwner() instanceof LivingEntity shooter))
                 continue;
@@ -360,7 +374,6 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
             }
         }
 
-        // Interceptar o projétil mais urgente
         if (mostUrgent != null) {
             interceptProjectile(mostUrgent, owner);
             projectileInterceptCooldown = 2;
@@ -368,7 +381,6 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
     }
 
     private void interceptProjectile(Projectile proj, LivingEntity owner) {
-        // Posições inline — sem Vec3 intermediário
         double projX = proj.getX();
         double projY = proj.getY();
         double projZ = proj.getZ();
@@ -381,7 +393,6 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
         double ownerY = owner.getY();
         double ownerZ = owner.getZ();
 
-        // Distância projétil → owner
         double dox = ownerX - projX;
         double doy = ownerY - projY;
         double doz = ownerZ - projZ;
@@ -390,12 +401,10 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
         double speed = Math.sqrt(motX * motX + motY * motY + motZ * motZ);
         double t = Math.min((speed > 0.001 ? dist / speed : 1.0) * 0.5, 8.0);
 
-        // Posição futura do projétil
         double futX = projX + motX * t;
         double futY = projY + motY * t;
         double futZ = projZ + motZ * t;
 
-        // Direção owner → futurePos (interceptDir inverso)
         double idX = ownerX - futX;
         double idY = ownerY - futY;
         double idZ = ownerZ - futZ;
@@ -406,15 +415,12 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
             idZ /= idLen;
         }
 
-        // Ponto de intercepção
         double icX = ownerX - idX;
         double icY = ownerY - idY;
         double icZ = ownerZ - idZ;
 
-        // setPos — mesma razão do aerial pursuit
         this.setPos(icX, icY, icZ);
 
-        // Face the incoming projectile
         double fx = (speed > 0.001) ? -motX / speed : 0;
         double fy = (speed > 0.001) ? -motY / speed : 0;
         double fz = (speed > 0.001) ? -motZ / speed : 0;
@@ -516,6 +522,27 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
         return ownerUUID;
     }
 
+    // ISummonedEntity
+    @Override
+    public void setSummonOwner(UUID uuid) {
+        setOwnerUUID(uuid);
+    }
+
+    @Override
+    public UUID getSummonOwner() {
+        return getOwnerUUID();
+    }
+
+    @Override
+    public void setSummonAbilityId(Identifier abilityId) {
+        this.summonAbilityId = abilityId;
+    }
+
+    @Override
+    public Identifier getSummonAbilityId() {
+        return summonAbilityId;
+    }
+
     @Override
     public boolean hurtServer(ServerLevel level,
             net.minecraft.world.damagesource.DamageSource source,
@@ -562,6 +589,10 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
         return furyManager;
     }
 
+    public RikaFlightManager getFlightManager() {
+        return flightManager;
+    }
+
     public int getDashCooldown() {
         return dashCooldown;
     }
@@ -591,12 +622,15 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
         super.addAdditionalSaveData(output);
         if (ownerUUID != null)
             output.store("OwnerUUID", UUIDUtil.CODEC, ownerUUID);
+        if (summonAbilityId != null)
+            output.store("SummonAbilityId", Identifier.CODEC, summonAbilityId);
     }
 
     @Override
     public void readAdditionalSaveData(ValueInput input) {
         super.readAdditionalSaveData(input);
         input.read("OwnerUUID", UUIDUtil.CODEC).ifPresent(uuid -> ownerUUID = uuid);
+        input.read("SummonAbilityId", Identifier.CODEC).ifPresent(id -> summonAbilityId = id);
         superpowerApplied = false;
     }
 
@@ -611,6 +645,7 @@ public class RikaEntity extends PathfinderMob implements GeoEntity {
                 .add(Attributes.ATTACK_DAMAGE, 45.0)
                 .add(Attributes.ARMOR, 15.0)
                 .add(Attributes.ARMOR_TOUGHNESS, 6.0)
+                .add(Attributes.STEP_HEIGHT, 1.0)
                 .add(Attributes.FOLLOW_RANGE, 48.0)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.5);
     }
