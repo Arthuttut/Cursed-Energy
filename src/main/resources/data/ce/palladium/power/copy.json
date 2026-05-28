@@ -15,7 +15,7 @@
                     "texture": "ce:textures/icon/techniques/rika.png"
                 },
                 "color": "magenta",
-                "list_index": 4
+                "list_index": 3
             },
             "entity": "ce:rika",
             "spawn_side": "back",

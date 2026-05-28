@@ -9,29 +9,35 @@ import java.util.*;
 public final class SummonRegistry {
 
     private static final Map<UUID, List<SummonEntry>> REGISTRY = new HashMap<>();
-    private static final Map<UUID, Integer> ACTIVATION_TICKS = new HashMap<>();
+
+    // CORRIGIDO: chave composta (playerUUID + abilityId) para ticks independentes
+    // por ability
+    private record TickKey(UUID playerUUID, Identifier abilityId) {
+    }
+
+    private static final Map<TickKey, Integer> ACTIVATION_TICKS = new HashMap<>();
 
     private SummonRegistry() {
     }
 
     // -----------------------------------------------------------------------
-    // Activation ticks (delay antes do spawn)
+    // Activation ticks — agora separados por (player, ability)
     // -----------------------------------------------------------------------
 
-    public static void putActivationTick(UUID playerUUID, int tick) {
-        ACTIVATION_TICKS.put(playerUUID, tick);
+    public static void putActivationTick(UUID playerUUID, Identifier abilityId, int tick) {
+        ACTIVATION_TICKS.put(new TickKey(playerUUID, abilityId), tick);
     }
 
-    public static @org.jetbrains.annotations.Nullable Integer getActivationTick(UUID playerUUID) {
-        return ACTIVATION_TICKS.get(playerUUID);
+    public static @org.jetbrains.annotations.Nullable Integer getActivationTick(UUID playerUUID, Identifier abilityId) {
+        return ACTIVATION_TICKS.get(new TickKey(playerUUID, abilityId));
     }
 
-    public static void removeActivationTick(UUID playerUUID) {
-        ACTIVATION_TICKS.remove(playerUUID);
+    public static void removeActivationTick(UUID playerUUID, Identifier abilityId) {
+        ACTIVATION_TICKS.remove(new TickKey(playerUUID, abilityId));
     }
 
-    public static boolean hasActivationTick(UUID playerUUID) {
-        return ACTIVATION_TICKS.containsKey(playerUUID);
+    public static boolean hasActivationTick(UUID playerUUID, Identifier abilityId) {
+        return ACTIVATION_TICKS.containsKey(new TickKey(playerUUID, abilityId));
     }
 
     // -----------------------------------------------------------------------
@@ -77,9 +83,13 @@ public final class SummonRegistry {
     // Cleanup
     // -----------------------------------------------------------------------
 
-    /** Remove e despawna TODOS os summons do player. */
+    /**
+     * Remove e despawna TODOS os summons e ticks do player (logout, morte, etc.).
+     */
     public static void cleanupPlayer(UUID playerUUID, ServerLevel level) {
-        ACTIVATION_TICKS.remove(playerUUID);
+        // Remove todos os ticks deste player
+        ACTIVATION_TICKS.keySet().removeIf(k -> k.playerUUID().equals(playerUUID));
+
         List<SummonEntry> entries = REGISTRY.remove(playerUUID);
         if (entries == null)
             return;
@@ -88,9 +98,11 @@ public final class SummonRegistry {
         }
     }
 
-    /** Remove e despawna apenas summons de uma habilidade específica do player. */
+    /** Remove e despawna apenas summons de uma ability específica do player. */
     public static void cleanupPlayer(UUID playerUUID, Identifier abilityId, ServerLevel level) {
-        ACTIVATION_TICKS.remove(playerUUID);
+        // CORRIGIDO: remove apenas o tick desta (player, ability) — não afeta as outras
+        ACTIVATION_TICKS.remove(new TickKey(playerUUID, abilityId));
+
         List<SummonEntry> entries = REGISTRY.get(playerUUID);
         if (entries == null)
             return;

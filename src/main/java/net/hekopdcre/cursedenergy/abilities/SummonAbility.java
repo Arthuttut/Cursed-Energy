@@ -5,7 +5,6 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.hekopdcre.cursedenergy.summon.ISummonedEntity;
 import net.hekopdcre.cursedenergy.summon.SummonRegistry;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -14,10 +13,12 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.threetag.palladium.power.ability.*;
 import net.threetag.palladium.power.energybar.EnergyBarUsage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -121,6 +122,43 @@ public class SummonAbility extends Ability {
         return CursedEnergyAbilities.SUMMON.get();
     }
 
+    // -----------------------------------------------------------------------
+    // Helper: coleta entidades desta ability específica do player
+    // -----------------------------------------------------------------------
+
+    private List<Entity> collectEntitiesToRemove(UUID playerUUID, ServerLevel serverLevel) {
+        List<Entity> toRemove = new ArrayList<>();
+
+        EntityType<?> targetType = BuiltInRegistries.ENTITY_TYPE.getOptional(entityId).orElse(null);
+
+        for (Entity e : serverLevel.getAllEntities()) {
+            if (!e.isAlive())
+                continue;
+
+            if (e instanceof ISummonedEntity s
+                    && s.getSummonOwner() != null
+                    && s.getSummonOwner().equals(playerUUID)
+                    && entityId.equals(s.getSummonAbilityId())) {
+                toRemove.add(e);
+                continue;
+            }
+
+            if (targetType != null
+                    && e.getType() == targetType
+                    && e instanceof TamableAnimal tamable
+                    && tamable.getOwner() instanceof Player owner
+                    && playerUUID.equals(owner.getUUID())) {
+                toRemove.add(e);
+            }
+        }
+
+        return toRemove;
+    }
+
+    // -----------------------------------------------------------------------
+    // Lifecycle
+    // -----------------------------------------------------------------------
+
     @Override
     public void firstTick(LivingEntity entity, AbilityInstance<?> abilityInstance) {
         if (entity.level().isClientSide())
@@ -132,37 +170,20 @@ public class SummonAbility extends Ability {
 
         UUID playerUUID = player.getUUID();
 
-        // Já tem summon registrado e vivo? Não faz nada.
-        if (SummonRegistry.hasActiveSummonFor(playerUUID, entityId, serverLevel))
-            return;
-
-        // Verifica se existe uma entidade viva no mundo que seja deste player/ability
-        // (caso de kit ou summon que sobreviveu com a habilidade desativada)
-        boolean foundOrphan = false;
-        for (Entity e : serverLevel.getAllEntities()) {
-            if (e instanceof ISummonedEntity s
-                    && s.getSummonOwner() != null
-                    && s.getSummonOwner().equals(playerUUID)
-                    && entityId.equals(s.getSummonAbilityId())
-                    && e.isAlive()) {
-                // Re-registra sem spawnar novo
-                SummonRegistry.register(playerUUID, e.getUUID(), entityId);
-                foundOrphan = true;
-                break;
-            }
+        List<Entity> toRemove = collectEntitiesToRemove(playerUUID, serverLevel);
+        for (Entity e : toRemove) {
+            e.remove(Entity.RemovalReason.DISCARDED);
         }
 
-        // Só agenda o spawn se não encontrou nenhum summon órfão
-        if (!foundOrphan) {
-            SummonRegistry.putActivationTick(playerUUID, 0);
-        }
+        SummonRegistry.cleanupPlayer(playerUUID, entityId, serverLevel);
+        // Inicia countdown exclusivo desta (player, ability)
+        SummonRegistry.putActivationTick(playerUUID, entityId, 0);
     }
 
     @Override
     public boolean tick(LivingEntity entity, AbilityInstance<?> abilityInstance, boolean enabled) {
         if (entity.level().isClientSide())
             return super.tick(entity, abilityInstance, enabled);
-
         if (!(entity instanceof ServerPlayer player))
             return super.tick(entity, abilityInstance, enabled);
         if (!(player.level() instanceof ServerLevel serverLevel))
@@ -171,13 +192,13 @@ public class SummonAbility extends Ability {
         UUID playerUUID = player.getUUID();
 
         if (!enabled) {
-            // Remove activation tick antes do cleanup — evita tick preso na reativação
-            SummonRegistry.removeActivationTick(playerUUID);
+            // Remove apenas o estado desta ability — não afeta outras summons ativas
+            SummonRegistry.removeActivationTick(playerUUID, entityId);
             SummonRegistry.cleanupPlayer(playerUUID, entityId, serverLevel);
             return super.tick(entity, abilityInstance, enabled);
         }
 
-        Integer activationTick = SummonRegistry.getActivationTick(playerUUID);
+        Integer activationTick = SummonRegistry.getActivationTick(playerUUID, entityId);
 
         if (activationTick != null) {
             if (showParticles && activationTick <= spawnDelayTicks) {
@@ -198,10 +219,10 @@ public class SummonAbility extends Ability {
             }
 
             if (activationTick >= spawnDelayTicks) {
-                SummonRegistry.removeActivationTick(playerUUID);
+                SummonRegistry.removeActivationTick(playerUUID, entityId);
                 spawnEntity(player, serverLevel);
             } else {
-                SummonRegistry.putActivationTick(playerUUID, activationTick + 1);
+                SummonRegistry.putActivationTick(playerUUID, entityId, activationTick + 1);
             }
         }
 
@@ -216,7 +237,7 @@ public class SummonAbility extends Ability {
             return;
 
         UUID playerUUID = player.getUUID();
-        SummonRegistry.removeActivationTick(playerUUID);
+        SummonRegistry.removeActivationTick(playerUUID, entityId);
         SummonRegistry.cleanupPlayer(playerUUID, entityId, serverLevel);
     }
 
@@ -226,14 +247,18 @@ public class SummonAbility extends Ability {
 
     private void spawnEntity(ServerPlayer player, ServerLevel serverLevel) {
         EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.getOptional(entityId).orElse(null);
-        if (entityType == null)
+        if (entityType == null) {
+            System.out.println("[SummonAbility] entityType null para: " + entityId);
             return;
+        }
 
         UUID playerUUID = player.getUUID();
 
-        // Segunda barreira: já tem summon ativo desta ability? Aborta.
-        if (SummonRegistry.hasActiveSummonFor(playerUUID, entityId, serverLevel))
-            return;
+        List<Entity> toRemove = collectEntitiesToRemove(playerUUID, serverLevel);
+        for (Entity e : toRemove) {
+            e.remove(Entity.RemovalReason.DISCARDED);
+        }
+        SummonRegistry.cleanupPlayer(playerUUID, entityId, serverLevel);
 
         double[] offset = getSpawnOffset(player, spawnSide, spawnDistance);
         double x = player.getX() + offset[0];
@@ -241,30 +266,33 @@ public class SummonAbility extends Ability {
         double z = player.getZ() + offset[2];
         float yRot = player.getYRot();
 
-        final LivingEntity[] holder = new LivingEntity[1];
-        entityType.create(serverLevel, e -> {
-            if (e instanceof LivingEntity le)
-                holder[0] = le;
-            e.setPos(x, y, z);
-            e.setYRot(yRot);
-        }, BlockPos.containing(x, y, z), EntitySpawnReason.MOB_SUMMONED, false, false);
+        System.out.println("[SummonAbility] tentando criar: " + entityId + " em " + x + " " + y + " " + z);
 
-        LivingEntity summoned = holder[0];
-        if (summoned == null)
+        Entity created = entityType.create(serverLevel, EntitySpawnReason.MOB_SUMMONED);
+
+        System.out.println("[SummonAbility] created: " + created);
+
+        if (!(created instanceof LivingEntity summoned)) {
+            System.out.println("[SummonAbility] não é LivingEntity ou é null: " + created);
             return;
+        }
 
-        // Registra owner via interface universal — sem hardcode
+        summoned.setPos(x, y, z);
+        summoned.setYRot(yRot);
+
         if (summoned instanceof ISummonedEntity s) {
             s.setSummonOwner(playerUUID);
             s.setSummonAbilityId(entityId);
         }
 
         if (tame && summoned instanceof TamableAnimal tamable) {
+            System.out.println("[SummonAbility] tentando domar...");
             tamable.tame(player);
         }
 
         serverLevel.addFreshEntity(summoned);
         SummonRegistry.register(playerUUID, summoned.getUUID(), entityId);
+        System.out.println("[SummonAbility] spawnou com sucesso: " + summoned.getType().toShortString());
     }
 
     // -----------------------------------------------------------------------
