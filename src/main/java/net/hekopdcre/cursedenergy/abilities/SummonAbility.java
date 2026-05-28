@@ -37,6 +37,9 @@ public class SummonAbility extends Ability {
                     Codec.DOUBLE.fieldOf("spawn_distance")
                             .orElse(2.0)
                             .forGetter(a -> a.spawnDistance),
+                    Codec.INT.fieldOf("spawn_count")
+                            .orElse(1)
+                            .forGetter(a -> a.spawnCount),
                     Codec.INT.fieldOf("spawn_delay_ticks")
                             .orElse(0)
                             .forGetter(a -> a.spawnDelayTicks),
@@ -60,6 +63,7 @@ public class SummonAbility extends Ability {
     public final Identifier entityId;
     public final String spawnSide;
     public final double spawnDistance;
+    public final int spawnCount;
     public final int spawnDelayTicks;
     public final boolean tame;
     public final Identifier spawnParticle;
@@ -74,6 +78,7 @@ public class SummonAbility extends Ability {
             Identifier entityId,
             String spawnSide,
             double spawnDistance,
+            int spawnCount,
             int spawnDelayTicks,
             boolean tame,
             Identifier spawnParticle,
@@ -84,6 +89,7 @@ public class SummonAbility extends Ability {
         this.entityId = entityId;
         this.spawnSide = spawnSide;
         this.spawnDistance = spawnDistance;
+        this.spawnCount = Math.max(1, spawnCount); // mínimo 1
         this.spawnDelayTicks = spawnDelayTicks;
         this.tame = tame;
         this.spawnParticle = spawnParticle;
@@ -99,6 +105,7 @@ public class SummonAbility extends Ability {
             Identifier entityId,
             String spawnSide,
             Double spawnDistance,
+            Integer spawnCount,
             Integer spawnDelayTicks,
             Boolean tame,
             Identifier spawnParticle,
@@ -109,6 +116,7 @@ public class SummonAbility extends Ability {
                 properties, stateManager, energyBarUsages,
                 entityId, spawnSide,
                 spawnDistance,
+                spawnCount,
                 spawnDelayTicks,
                 tame,
                 spawnParticle,
@@ -176,7 +184,6 @@ public class SummonAbility extends Ability {
         }
 
         SummonRegistry.cleanupPlayer(playerUUID, entityId, serverLevel);
-        // Inicia countdown exclusivo desta (player, ability)
         SummonRegistry.putActivationTick(playerUUID, entityId, 0);
     }
 
@@ -192,7 +199,6 @@ public class SummonAbility extends Ability {
         UUID playerUUID = player.getUUID();
 
         if (!enabled) {
-            // Remove apenas o estado desta ability — não afeta outras summons ativas
             SummonRegistry.removeActivationTick(playerUUID, entityId);
             SummonRegistry.cleanupPlayer(playerUUID, entityId, serverLevel);
             return super.tick(entity, abilityInstance, enabled);
@@ -220,7 +226,7 @@ public class SummonAbility extends Ability {
 
             if (activationTick >= spawnDelayTicks) {
                 SummonRegistry.removeActivationTick(playerUUID, entityId);
-                spawnEntity(player, serverLevel);
+                spawnEntities(player, serverLevel);
             } else {
                 SummonRegistry.putActivationTick(playerUUID, entityId, activationTick + 1);
             }
@@ -242,10 +248,10 @@ public class SummonAbility extends Ability {
     }
 
     // -----------------------------------------------------------------------
-    // Spawn
+    // Spawn — cria spawnCount entidades espalhadas ao redor do ponto base
     // -----------------------------------------------------------------------
 
-    private void spawnEntity(ServerPlayer player, ServerLevel serverLevel) {
+    private void spawnEntities(ServerPlayer player, ServerLevel serverLevel) {
         EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.getOptional(entityId).orElse(null);
         if (entityType == null) {
             System.out.println("[SummonAbility] entityType null para: " + entityId);
@@ -260,39 +266,43 @@ public class SummonAbility extends Ability {
         }
         SummonRegistry.cleanupPlayer(playerUUID, entityId, serverLevel);
 
-        double[] offset = getSpawnOffset(player, spawnSide, spawnDistance);
-        double x = player.getX() + offset[0];
-        double y = player.getY();
-        double z = player.getZ() + offset[2];
+        double[] baseOffset = getSpawnOffset(player, spawnSide, spawnDistance);
         float yRot = player.getYRot();
 
-        System.out.println("[SummonAbility] tentando criar: " + entityId + " em " + x + " " + y + " " + z);
+        for (int i = 0; i < spawnCount; i++) {
+            // Espalha as entidades em arco ao redor do ponto base
+            // Se só 1, spawna direto no ponto base sem desvio
+            double spreadX = spawnCount > 1 ? (i - (spawnCount - 1) / 2.0) * 1.5 : 0.0;
 
-        Entity created = entityType.create(serverLevel, EntitySpawnReason.MOB_SUMMONED);
+            double x = player.getX() + baseOffset[0] + spreadX * Math.cos(Math.toRadians(yRot));
+            double y = player.getY();
+            double z = player.getZ() + baseOffset[2] + spreadX * Math.sin(Math.toRadians(yRot));
 
-        System.out.println("[SummonAbility] created: " + created);
+            System.out.println("[SummonAbility] criando " + (i + 1) + "/" + spawnCount + ": " + entityId + " em " + x
+                    + " " + y + " " + z);
 
-        if (!(created instanceof LivingEntity summoned)) {
-            System.out.println("[SummonAbility] não é LivingEntity ou é null: " + created);
-            return;
+            Entity created = entityType.create(serverLevel, EntitySpawnReason.MOB_SUMMONED);
+            if (!(created instanceof LivingEntity summoned)) {
+                System.out.println("[SummonAbility] não é LivingEntity ou é null: " + created);
+                continue;
+            }
+
+            summoned.setPos(x, y, z);
+            summoned.setYRot(yRot);
+
+            if (summoned instanceof ISummonedEntity s) {
+                s.setSummonOwner(playerUUID);
+                s.setSummonAbilityId(entityId);
+            }
+
+            if (tame && summoned instanceof TamableAnimal tamable) {
+                tamable.tame(player);
+            }
+
+            serverLevel.addFreshEntity(summoned);
+            SummonRegistry.register(playerUUID, summoned.getUUID(), entityId);
+            System.out.println("[SummonAbility] spawnou: " + summoned.getType().toShortString());
         }
-
-        summoned.setPos(x, y, z);
-        summoned.setYRot(yRot);
-
-        if (summoned instanceof ISummonedEntity s) {
-            s.setSummonOwner(playerUUID);
-            s.setSummonAbilityId(entityId);
-        }
-
-        if (tame && summoned instanceof TamableAnimal tamable) {
-            System.out.println("[SummonAbility] tentando domar...");
-            tamable.tame(player);
-        }
-
-        serverLevel.addFreshEntity(summoned);
-        SummonRegistry.register(playerUUID, summoned.getUUID(), entityId);
-        System.out.println("[SummonAbility] spawnou com sucesso: " + summoned.getType().toShortString());
     }
 
     // -----------------------------------------------------------------------

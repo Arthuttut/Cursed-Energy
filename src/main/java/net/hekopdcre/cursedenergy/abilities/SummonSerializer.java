@@ -33,6 +33,9 @@ public class SummonSerializer extends AbilitySerializer<SummonAbility> {
                                 .addOptional("spawn_distance", TYPE_DOUBLE,
                                                 "Distance in blocks from the player where the entity will spawn.",
                                                 2.0)
+                                .addOptional("spawn_count", TYPE_INT,
+                                                "How many entities to spawn. They will be spread in a line perpendicular to the spawn direction. Default is 1.",
+                                                1)
                                 .addOptional("spawn_delay_ticks", TYPE_INT,
                                                 "How many ticks after activation to wait before spawning. 0 = immediate, 20 = 1 second.",
                                                 0)
@@ -58,6 +61,7 @@ public class SummonSerializer extends AbilitySerializer<SummonAbility> {
                                                 Identifier.parse("ce:rika"),
                                                 "front",
                                                 2.0,
+                                                1,
                                                 0,
                                                 true,
                                                 Identifier.parse("minecraft:portal"),
