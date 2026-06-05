@@ -10,18 +10,23 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.threetag.palladium.power.EntityPowerHandler;
 import net.threetag.palladium.power.PowerUtil;
+import net.threetag.palladium.power.EntityPowerHandler;
+import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
 @EventBusSubscriber(modid = "ce")
 public class TameDeathHandler {
 
     private static final Identifier COPY_POWER = Identifier.parse("ce:copy");
-    private static final Identifier RIKA_ID = Identifier.parse("ce:rika");
+    private static final Identifier RIKA_ENTITY_ID = Identifier.parse("ce:rika");
+    private static final Identifier RING_ID = Identifier.parse("ce:ring");
+    private static final Identifier RIKAS_RING_ID = Identifier.parse("ce:rikas_ring");
     private static final float SPAWN_CHANCE = 0.4f;
 
     @SubscribeEvent
@@ -29,26 +34,36 @@ public class TameDeathHandler {
         Level level = event.getEntity().level();
         if (!(level instanceof ServerLevel serverLevel))
             return;
-
         if (!(event.getEntity() instanceof TamableAnimal pet))
             return;
         if (!(pet.getOwner() instanceof ServerPlayer player))
             return;
 
-        EntityPowerHandler handler = PowerUtil.getPowerHandler(player);
-        if (handler == null)
+        EntityPowerHandler powerHandler = PowerUtil.getPowerHandler(player);
+        if (powerHandler == null)
             return;
-
         if (!PowerUtil.hasPower(player, COPY_POWER))
             return;
 
-        // checa se já existe uma Rika viva com esse dono
-        boolean rikaJaExiste = serverLevel.getEntitiesOfClass(
+        // Check if player has ce:ring in the ring curio slot
+        boolean hasRing = CuriosApi.getCuriosInventory(player).map(inventory -> {
+            var slotResult = inventory.findFirstCurio(stack -> {
+                Identifier itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+                return RING_ID.equals(itemId);
+            });
+            return slotResult.isPresent();
+        }).orElse(false);
+
+        if (!hasRing)
+            return;
+
+        // Check if a Rika already exists for this player
+        boolean rikaAlreadyExists = serverLevel.getEntitiesOfClass(
                 RikaEntity.class,
                 player.getBoundingBox().inflate(256),
                 r -> player.getUUID().equals(r.getOwnerUUID()) && r.isAlive()).size() > 0;
 
-        if (rikaJaExiste)
+        if (rikaAlreadyExists)
             return;
 
         if (serverLevel.getRandom().nextFloat() >= SPAWN_CHANCE)
@@ -56,14 +71,14 @@ public class TameDeathHandler {
 
         @SuppressWarnings("unchecked")
         EntityType<? extends LivingEntity> entityType = (EntityType<? extends LivingEntity>) BuiltInRegistries.ENTITY_TYPE
-                .getOptional(RIKA_ID).orElse(null);
+                .getOptional(RIKA_ENTITY_ID).orElse(null);
         if (entityType == null)
             return;
 
         double x = pet.getX(), y = pet.getY(), z = pet.getZ();
         float yRot = pet.getYRot();
-
         final LivingEntity[] holder = new LivingEntity[1];
+
         entityType.create(serverLevel, e -> {
             holder[0] = (LivingEntity) e;
             e.setPos(x, y, z);
@@ -76,9 +91,33 @@ public class TameDeathHandler {
 
         if (rika instanceof RikaEntity rikaEntity) {
             rikaEntity.setOwnerUUID(player.getUUID());
-            player.addTag("rika_cursed"); // <- adiciona a tag ao dono
+            rikaEntity.setSummonAbilityId(RIKA_ENTITY_ID);
+            player.addTag("rika_cursed");
         }
 
         serverLevel.addFreshEntity(rika);
+
+        // Replace ce:ring with ce:rikas_ring in the ring curio slot
+        CuriosApi.getCuriosInventory(player).ifPresent(inventory -> {
+            ICurioStacksHandler ringHandler = inventory.getCurios().get("ring");
+            if (ringHandler == null)
+                return;
+
+            var stacks = ringHandler.getStacks();
+            for (int i = 0; i < stacks.getSlots(); i++) {
+                ItemStack stack = stacks.getStackInSlot(i);
+                Identifier itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+                if (RING_ID.equals(itemId)) {
+                    stacks.setStackInSlot(i, getRikasRingStack());
+                    return;
+                }
+            }
+        });
+    }
+
+    private static ItemStack getRikasRingStack() {
+        return BuiltInRegistries.ITEM.getOptional(RIKAS_RING_ID)
+                .map(ItemStack::new)
+                .orElse(ItemStack.EMPTY);
     }
 }

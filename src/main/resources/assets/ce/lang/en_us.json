@@ -9,10 +9,12 @@
   "ability.ce.divergent_fist": "Divergent Fist",
   "ability.ce.domain_expansion": "Domain Expansion",
   "ability.ce.entity_ride": "Entity Ride",
+  "ability.ce.limitless": "Limitless",
   "ability.ce.summon": "Summon",
   "ability.ce.swap": "Swap",
   "item.ce.cursed_energy": "Cursed Energy",
   "item.ce.sukuna_finger": "Sukuna Finger",
+  "item.ce.ring": "Ring",
   "item.ce.rikas_ring": "Rika's Ring",
   "item.ce.painting_of_death": "Painting Of Death"
 }

@@ -36,6 +36,14 @@
                 }
             }
         },
+        "limitless": {
+            "type": "ce:limitless",
+            "range": 2,
+            "effect": 1.7,
+            "affect_hostile": true,
+            "affect_passive": false,
+            "affect_inanimate": true
+        },
         "lapse_blue": {
             "type": "palladium:dummy",
             "properties": {
@@ -51,7 +59,7 @@
                 }
             }
         },
-                "lapse_red": {
+        "lapse_red": {
             "type": "palladium:dummy",
             "properties": {
                 "title": "Lapse Red",

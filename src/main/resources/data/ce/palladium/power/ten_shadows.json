@@ -4,28 +4,149 @@
     "parent": "ce:cursed_energy_control",
     "abilities": {
         "divine_dogs": {
-            "type": "palladium:dummy",
+            "type": "ce:summon",
             "properties": {
                 "title": "Divine Dogs",
-                "icon": "ce:textures/icon/techniques/divine_dogs2.png",
+                "icon": {
+                    "type": "palladium:texture",
+                    "texture": "ce:textures/icon/techniques/divine_dogs2.png"
+                },
                 "color": "black",
                 "list_index": 0
             },
+            "entity": "minecraft:wolf",
+            "spawn_side": "front",
+            "spawn_distance": 2,
+            "spawn_count": 2,
+            "spawn_delay_ticks": 15,
+            "tame": true,
+            "spawn_particle": "minecraft:large_smoke",
+            "spawn_particle_count": 5,
+            "freeze_until_spawn": true,
+            "show_particles": true,
             "state": {
                 "enabling": {
                     "type": "palladium:key_bind",
-                    "behaviour": "activation"
+                    "behaviour": "toggle"
+                }
+            }
+        },
+        "bunnys": {
+            "type": "ce:summon",
+            "properties": {
+                "title": "Bunnies",
+                "icon": {
+                    "type": "palladium:texture",
+                    "texture": "ce:textures/icon/techniques/divine_dogs2.png"
+                },
+                "color": "black",
+                "list_index": 1
+            },
+            "entity": "minecraft:rabbit",
+            "spawn_side": "front",
+            "spawn_distance": 2,
+            "spawn_count": 700,
+            "spawn_delay_ticks": 0,
+            "teleport_to_owner": false,
+            "tame": true,
+            "override_ai": true,
+            "spawn_particle": "minecraft:portal",
+            "spawn_particle_count": 50,
+            "freeze_until_spawn": false,
+            "show_particles": true,
+            "random_spawn_position": true,
+            "random_spawn_radius": 20,
+            "state": {
+                "enabling": {
+                    "type": "palladium:key_bind",
+                    "behaviour": "toggle"
+                }
+            }
+        },
+        "skeletons": {
+            "type": "ce:summon",
+            "properties": {
+                "title": "Skeletons",
+                "icon": {
+                    "type": "palladium:texture",
+                    "texture": "ce:textures/icon/techniques/divine_dogs2.png"
+                },
+                "color": "black",
+                "list_index": 2
+            },
+            "entity": "minecraft:wither_skeleton",
+            "spawn_side": "back",
+            "spawn_distance": 3,
+            "spawn_count": 25,
+            "spawn_delay_ticks": 0,
+            "tame": true,
+            "override_ai": true,
+            "teleport_to_owner": false,
+            "random_spawn_position": true,
+            "random_spawn_radius": 6,
+            "spawn_particle": "minecraft:portal",
+            "spawn_particle_count": 50,
+            "freeze_until_spawn": false,
+            "show_particles": true,
+            "state": {
+                "enabling": {
+                    "type": "palladium:key_bind",
+                    "behaviour": "toggle"
+                }
+            }
+        },
+        "mahoraga": {
+            "type": "ce:summon",
+            "properties": {
+                "title": "Iron Golem",
+                "icon": {
+                    "type": "palladium:texture",
+                    "texture": "ce:textures/icon/techniques/divine_dogs2.png"
+                },
+                "color": "black",
+                "list_index": 3
+            },
+            "entity": "minecraft:iron_golem",
+            "spawn_side": "front",
+            "spawn_distance": 2,
+            "spawn_count": 1,
+            "teleport_to_owner": false,
+            "spawn_delay_ticks": 0,
+            "tame": true,
+            "override_ai": true,
+            "spawn_particle": "minecraft:portal",
+            "spawn_particle_count": 5,
+            "freeze_until_spawn": false,
+            "show_particles": true,
+            "state": {
+                "enabling": {
+                    "type": "palladium:key_bind",
+                    "behaviour": "toggle"
                 }
             }
         },
         "expansion": {
-            "type": "palladium:dummy",
+            "type": "ce:domain_expansion",
             "properties": {
                 "title": "Expansion",
                 "icon": "ce:textures/icon/misc/shrine.png",
                 "color": "black",
                 "list_index": 4
             },
+            "radius": 15,
+            "height": 15,
+            "expand_speed": 0.75,
+            "restore_speed": 0.30,
+            "dome_thickness": 1.65,
+            "restore_batch_size": 200,
+            "spawn_particles_on_water": true,
+            "dome_main_block": "minecraft:black_concrete",
+            "dome_accent_block_1": "minecraft:crying_obsidian",
+            "dome_accent_block_2": "minecraft:blackstone",
+            "dome_base_accent_block": "minecraft:polished_blackstone",
+            "floor_main_block": "minecraft:black_concrete",
+            "floor_accent_block_1": "minecraft:crying_obsidian",
+            "floor_accent_block_2": "minecraft:polished_blackstone",
             "state": {
                 "enabling": {
                     "type": "palladium:key_bind",

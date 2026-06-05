@@ -32,11 +32,24 @@
                     "cooldown": 6000,
                     "time": 6000
                 },
-                "unlocking": {
-                    "type": "palladium:has_tag",
-                    "tag": "rika_cursed"
-                }
+                "unlocking": [
+                    {
+                        "type": "palladium:has_tag",
+                        "tag": "rika_cursed"
+                    }
+                ]
             }
+        },
+        "ride": {
+            "type": "ce:entity_ride",
+            "properties": {
+                "hidden_in_gui": true
+            },
+            "use_whitelist": true,
+            "owner_only": true,
+            "whitelist": [
+                "ce:rika"
+            ]
         }
     }
 }

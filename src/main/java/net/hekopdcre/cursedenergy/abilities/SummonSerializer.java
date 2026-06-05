@@ -40,7 +40,10 @@ public class SummonSerializer extends AbilitySerializer<SummonAbility> {
                                                 "How many ticks after activation to wait before spawning. 0 = immediate, 20 = 1 second.",
                                                 0)
                                 .addOptional("tame", TYPE_BOOLEAN,
-                                                "If true, the summoned entity will be owned/tamed by the player.",
+                                                "If true, the summoned entity will be owned/tamed by the player. For TamableAnimals (wolf, cat, etc.) uses the native tame() system. For custom entities implementing ISummonedEntity (e.g. Rika), the owner is set automatically and their own AI is used. For generic mobs, pet goals are injected.",
+                                                false)
+                                .addOptional("override_ai", TYPE_BOOLEAN,
+                                                "If true, clears ALL existing AI goals from the summoned mob and replaces them with generic pet goals (follow owner, defend owner, attack owner's target). Useful for mobs like zombies that would otherwise attack the player. Has no effect on non-Mob entities.",
                                                 false)
                                 .addOptional("spawn_particle", TYPE_STRING,
                                                 "Particle ID to display at the spawn point while waiting. Only shown if spawn_delay_ticks > 0. E.g: \"minecraft:portal\", \"minecraft:flame\".",
@@ -54,6 +57,18 @@ public class SummonSerializer extends AbilitySerializer<SummonAbility> {
                                 .addOptional("show_particles", TYPE_BOOLEAN,
                                                 "If true, particles will appear at the spawn point during the delay. Requires spawn_delay_ticks > 0.",
                                                 true)
+                                .addOptional("max_wander_distance", TYPE_DOUBLE,
+                                                "Maximum distance in blocks the summoned entity may stray from its owner. If exceeded and teleport_to_owner is true, the entity is immediately teleported back. Has no effect on ISummonedEntity implementations that manage their own AI.",
+                                                20.0)
+                                .addOptional("teleport_to_owner", TYPE_BOOLEAN,
+                                                "If true, the entity will teleport back to the owner when it exceeds max_wander_distance (or the internal follow threshold). If false, the entity will only pathfind toward the owner and never teleport.",
+                                                true)
+                                .addOptional("random_spawn_position", TYPE_BOOLEAN,
+                                                "If true, each entity in a multi-spawn is placed at a random position within random_spawn_radius blocks of the base spawn point. Prevents multiple entities from spawning on the same block and suffocating each other.",
+                                                false)
+                                .addOptional("random_spawn_radius", TYPE_DOUBLE,
+                                                "Radius in blocks used when random_spawn_position is true. Each entity spawns at a random angle and random distance between 0 and this value from the base spawn point. Minimum is 0.5.",
+                                                2.0)
                                 .addExampleObject(new SummonAbility(
                                                 AbilityProperties.BASIC,
                                                 AbilityStateManager.EMPTY,
@@ -64,9 +79,14 @@ public class SummonSerializer extends AbilitySerializer<SummonAbility> {
                                                 1,
                                                 0,
                                                 true,
+                                                false,
                                                 Identifier.parse("minecraft:portal"),
                                                 5,
                                                 false,
-                                                true));
+                                                true,
+                                                20.0,
+                                                true,
+                                                false, // randomSpawnPosition
+                                                2.0)); // randomSpawnRadius
         }
 }

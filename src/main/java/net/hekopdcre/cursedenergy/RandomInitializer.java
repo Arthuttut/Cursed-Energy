@@ -111,15 +111,26 @@ public class RandomInitializer {
 
         // Técnica extra
         double roll = RANDOM.nextDouble();
-        if (roll < 0.25) {
-            /* nenhuma */ } else if (roll < 0.55)
+
+        if (roll < 0.20) {
+            /* nenhuma */
+        } else if (roll < 0.38) {
             givePower(server, player, "boogie_woogie");
-        else if (roll < 0.75)
+        } else if (roll < 0.53) {
             givePower(server, player, "cursed_speech");
-        else if (roll < 0.90)
+        } else if (roll < 0.65) {
+            givePower(server, player, "projection_sorcery");
+        } else if (roll < 0.75) {
+            givePower(server, player, "vessel");
+        } else if (roll < 0.84) {
+            givePower(server, player, "copy");
+        } else if (roll < 0.91) {
             givePower(server, player, "ten_shadows");
-        else
+        } else if (roll < 0.97) {
+            givePower(server, player, "comedian");
+        } else {
             givePower(server, player, "limitless");
+        }
     }
 
     // ------------------------------------------------------------------ //

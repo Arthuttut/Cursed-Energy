@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:armor",
+  "armor_material": "ce:jujutsu_uniform",
+  "armor_type": "chestplate",
+  "properties": {
+    "tab": {
+      "type": "add_before",
+      "tab": "minecraft:combat",
+      "target": "minecraft:leather_helmet"
+    },
+    "components": {
+      "palladium:openable": true
+    }
+  }
+}

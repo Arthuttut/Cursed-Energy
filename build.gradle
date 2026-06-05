@@ -32,6 +32,12 @@ repositories {
         name = "GeckoLib"
         url = "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
     }
+    repositories {
+    maven {
+        name = "Illusive Soulworks maven"
+        url = "https://maven.theillusivec4.top/"
+  }
+    }
 }
 
 base {
@@ -99,6 +105,8 @@ dependencies {
     implementation files('libs/palladium-5.0.0+26.1.2.jar')
     implementation files('libs/PlayerAnimationLibMerged-1.2.3+mc.26.1.jar')
     implementation "com.geckolib:geckolib-neoforge-26.1.2:5.5.1"
+    compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}:api"
+    runtimeOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}"
     interfaceInjectionData "com.geckolib:geckolib-neoforge-26.1.2:5.5.1"
 }
 

@@ -3,6 +3,7 @@ package net.hekopdcre.cursedenergy;
 import com.mojang.logging.LogUtils;
 import net.hekopdcre.cursedenergy.abilities.CursedEnergyAbilities;
 import net.hekopdcre.cursedenergy.abilities.DomainExpansionAbility;
+import net.hekopdcre.cursedenergy.abilities.summon.MinionDefenseHandler;
 import net.hekopdcre.cursedenergy.client.ClientEvents;
 import net.hekopdcre.cursedenergy.entity.ModEntities;
 import net.hekopdcre.cursedenergy.entity.custom.RikaEntity;
@@ -31,6 +32,7 @@ public class CursedEnergy {
         modEventBus.addListener(RikaEntity::onRegisterAttributes);
         NeoForge.EVENT_BUS.register(RandomInitializer.class);
         NeoForge.EVENT_BUS.register(LateDamage.class);
+        NeoForge.EVENT_BUS.register(MinionDefenseHandler.class);
         NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post event) -> {
             for (ServerLevel level : event.getServer().getAllLevels()) {
                 DomainExpansionAbility.globalTick(level);
