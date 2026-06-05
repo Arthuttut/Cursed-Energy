@@ -37,7 +37,7 @@ A Simple JJK Mod that adds cursed energy and jujutsu techniques to Minecraft.
 
 # Requirements
 
-- NeoForge 26.1.2 stable beta, alpha
+- NeoForge 26.1.2.70-beta
 - PalladiumPreview 5.0.0, latest version
 - Player Animation Library 1.2.3 or above
 
