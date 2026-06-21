@@ -40,13 +40,15 @@ A Simple JJK Mod that adds cursed energy and jujutsu techniques to Minecraft.
 - NeoForge 26.1.2.73-beta
 - PalladiumPreview 5.0.0, latest version
 - Player Animation Library 1.2.3 or above
+- Geckolib 5.5.1
+- CuriosAPI 15.0.0-beta.2
 
 ---
 
 # Installation
 
 1. Install NeoForge
-2. Install Palladium and Player Animation Library
+2. Install Palladium, Player Animation Library, CuriosAPI and Geckolib
 3. Put the mod inside the `mods` folder
 
 ---
