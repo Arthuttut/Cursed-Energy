@@ -15,7 +15,7 @@
 
 A Simple JJK Mod that adds cursed energy and jujutsu techniques to Minecraft.  
 
-**WIP:** Cursed Energy, Boogie Woogie, Vessel, Shrine(Sukuna) and Projection Sorcery
+**WIP:** Boogie Woogie, Vessel, Shrine, Projection Sorcery, Heavenly Restriction, Disaster Flames, Copy, Physical Prowess and Ten Shadows
 
 ---
 
